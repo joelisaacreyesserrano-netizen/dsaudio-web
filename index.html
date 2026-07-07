@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DsAudio — Car Audio & Electronics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #E8150E;
+      --red-glow: rgba(232,21,14,0.35);
+      --red-dim: rgba(232,21,14,0.12);
+      --white: #ffffff;
+      --bg: #080808;
+      --bg-card: #101010;
+      --bg-card2: #161616;
+      --text: #c8c8c8;
+      --text-dim: #777777;
+      --border: rgba(255,255,255,0.06);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--red); }
+
+    /* ===== NAV ===== */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 200;
+      height: 68px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px;
+      transition: background 0.4s, border-color 0.4s;
+      border-bottom: 1px solid transparent;
+    }
+    nav.scrolled {
+      background: rgba(8,8,8,0.92);
+      backdrop-filter: blur(24px);
+      border-color: var(--border);
+    }
+    .nav-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.4rem; font-weight: 900;
+      color: var(--white); letter-spacing: 3px;
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--red); }
+    .nav-links { display: flex; gap: 36px; list-style: none; align-items: center; }
+    .nav-links a {
+      color: var(--text-dim); text-decoration: none;
+      font-size: 0.8rem; font-weight: 500;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-cta {
+      background: var(--red) !important;
+      color: white !important;
+      padding: 10px 24px; border-radius: 3px;
+      transition: opacity 0.2s, transform 0.2s !important;
+    }
+    .nav-cta:hover { opacity: 0.85; transform: translateY(-1px); }
+    .nav-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .nav-toggle span { display: block; width: 22px; height: 2px; background: var(--white); transition: all 0.3s; }
+
+    /* ===== HERO — Scroll Video ===== */
+    .hero-scroll-video {
+      height: 500vh;
+      position: relative;
+    }
+    .hero-sticky {
+      position: sticky; top: 0;
+      height: 100vh; width: 100%;
+      overflow: hidden;
+    }
+    .hero-video {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    /* dark gradient overlays for text legibility */
+    .hero-sticky::before {
+      content: '';
+      position: absolute; inset: 0; z-index: 1;
+      background:
+        linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.6) 100%),
+        radial-gradient(ellipse 80% 60% at 50% 100%, rgba(232,21,14,0.18) 0%, transparent 70%);
+    }
+    /* dot grid overlay */
+    .hero-sticky::after {
+      content: '';
+      position: absolute; inset: 0; z-index: 1;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 36px 36px;
+      pointer-events: none;
+    }
+    /* progress bar at bottom */
+    .hero-progress {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 3px; background: rgba(255,255,255,0.1); z-index: 10;
+    }
+    .hero-progress-fill {
+      height: 100%; width: 0%; background: var(--red);
+      transition: width 0.05s linear;
+    }
+
+    .hero-content {
+      position: absolute; inset: 0; z-index: 2;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 0 24px; max-width: 880px;
+      margin: 0 auto; left: 50%; transform: translateX(-50%);
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 10px;
+      border: 1px solid rgba(232,21,14,0.5); padding: 7px 18px; border-radius: 2px;
+      margin-bottom: 32px;
+      animation: fd-down 0.9s ease both;
+    }
+    .hero-eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); animation: pulse 2s ease infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+    .hero-eyebrow span { font-size: 0.72rem; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; color: var(--red); }
+
+    h1.hero-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(3.2rem, 9vw, 7.5rem);
+      font-weight: 900; line-height: 0.92;
+      color: var(--white); letter-spacing: -3px;
+      margin-bottom: 28px;
+      animation: fd-up 0.9s 0.15s ease both;
+    }
+    h1.hero-title .accent { color: var(--red); }
+    .hero-sub {
+      font-size: clamp(0.95rem, 2vw, 1.15rem);
+      color: var(--text-dim); font-weight: 300;
+      line-height: 1.7; margin-bottom: 52px;
+      animation: fd-up 0.9s 0.3s ease both;
+    }
+    .hero-actions {
+      display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+      animation: fd-up 0.9s 0.45s ease both;
+    }
+    .btn-primary {
+      background: var(--red); color: white;
+      padding: 17px 40px; border-radius: 3px;
+      text-decoration: none; font-weight: 600;
+      font-size: 0.85rem; letter-spacing: 1.5px; text-transform: uppercase;
+      border: 2px solid var(--red); transition: all 0.3s;
+    }
+    .btn-primary:hover { background: transparent; color: var(--red); box-shadow: 0 0 40px var(--red-glow); transform: translateY(-2px); }
+    .btn-ghost {
+      background: transparent; color: var(--white);
+      padding: 17px 40px; border-radius: 3px;
+      text-decoration: none; font-weight: 500;
+      font-size: 0.85rem; letter-spacing: 1.5px; text-transform: uppercase;
+      border: 2px solid rgba(255,255,255,0.15); transition: all 0.3s;
+    }
+    .btn-ghost:hover { border-color: rgba(255,255,255,0.5); transform: translateY(-2px); }
+
+    .hero-scroll-hint {
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      animation: fd-in 1s 1s ease both;
+    }
+    .hero-scroll-hint p { font-size: 0.68rem; letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+    .scroll-bar { width: 1px; height: 48px; background: linear-gradient(to bottom, var(--red), transparent); animation: bar-anim 2s ease infinite; }
+    @keyframes bar-anim { 0%,100%{opacity:0.2; transform:scaleY(0.6);} 50%{opacity:1; transform:scaleY(1);} }
+
+    @keyframes fd-down { from{opacity:0;transform:translateY(-20px);} to{opacity:1;transform:translateY(0);} }
+    @keyframes fd-up   { from{opacity:0;transform:translateY(35px);}  to{opacity:1;transform:translateY(0);} }
+    @keyframes fd-in   { from{opacity:0;} to{opacity:1;} }
+
+    /* ===== DIVIDER BAR ===== */
+    .divider-bar {
+      background: var(--bg-card);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      padding: 52px 48px;
+    }
+    .divider-bar .container { max-width: 1200px; margin: 0 auto; }
+    .bar-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0; text-align: center;
+    }
+    .bar-item {
+      padding: 16px 24px;
+      border-right: 1px solid var(--border);
+    }
+    .bar-item:last-child { border-right: none; }
+    .bar-num {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 900;
+      color: var(--white); line-height: 1; margin-bottom: 8px;
+    }
+    .bar-num .ctr { color: var(--red); }
+    .bar-label { font-size: 0.72rem; letter-spacing: 2.5px; text-transform: uppercase; color: var(--text-dim); }
+
+    /* ===== SHARED SECTION STYLES ===== */
+    section { padding: 112px 48px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .section-tag { display: block; font-size: 0.72rem; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; color: var(--red); margin-bottom: 14px; }
+    .section-title { font-family: 'Orbitron', sans-serif; font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 700; color: var(--white); line-height: 1.1; margin-bottom: 18px; }
+    .section-body { color: var(--text-dim); font-size: 0.97rem; line-height: 1.75; max-width: 500px; }
+
+    /* ===== SERVICES ===== */
+    #services .services-top { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 64px; flex-wrap: wrap; gap: 24px; }
+    .services-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      border: 1px solid var(--border); gap: 1px; background: var(--border);
+    }
+
+    /* Icon-only card */
+    .svc-card {
+      background: var(--bg); padding: 40px 32px;
+      position: relative; overflow: hidden; min-height: 220px;
+      transition: background 0.35s cubic-bezier(0.16,1,0.3,1);
+    }
+    .svc-card::before {
+      content: ''; position: absolute; bottom: 0; left: 0;
+      width: 0; height: 2px; background: var(--red); transition: width 0.4s ease;
+    }
+    .svc-card:hover { background: var(--bg-card2); }
+    .svc-card:hover::before { width: 100%; }
+    .svc-icon {
+      width: 46px; height: 46px; border-radius: 8px;
+      border: 1px solid rgba(232,21,14,0.25); background: var(--red-dim);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; margin-bottom: 20px;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .svc-card:hover .svc-icon { background: var(--red); border-color: var(--red); }
+    .svc-name { font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--white); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+    .svc-desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.65; }
+
+    /* Photo card */
+    .svc-photo {
+      position: relative; overflow: hidden; min-height: 360px; cursor: pointer;
+    }
+    .svc-photo img {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+      object-position: center center;
+      filter: brightness(0.38) saturate(0.7);
+      transition: transform 0.75s cubic-bezier(0.16,1,0.3,1), filter 0.75s;
+    }
+    .svc-photo:hover img { transform: scale(1.07); filter: brightness(0.58) saturate(1); }
+    .svc-photo-overlay {
+      position: absolute; inset: 0; z-index: 1;
+      background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.15) 60%, transparent 100%);
+    }
+    .svc-photo::after {
+      content: ''; position: absolute; bottom: 0; left: 0;
+      width: 0; height: 2px; background: var(--red); z-index: 3;
+      transition: width 0.4s ease;
+    }
+    .svc-photo:hover::after { width: 100%; }
+    .svc-photo-body {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 32px 28px; z-index: 2;
+    }
+    .svc-photo-icon {
+      width: 44px; height: 44px; border-radius: 6px;
+      border: 1px solid rgba(232,21,14,0.4); background: rgba(232,21,14,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; margin-bottom: 14px;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .svc-photo:hover .svc-photo-icon { background: var(--red); border-color: var(--red); }
+
+    /* Diagnostic featured row */
+    .svc-diagnostic {
+      grid-column: 1 / -1;
+      background: var(--bg); padding: 40px 48px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 32px; flex-wrap: wrap; position: relative; overflow: hidden;
+      border-top: 1px solid rgba(232,21,14,0.2) !important;
+    }
+    .svc-diagnostic::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(232,21,14,0.07) 0%, transparent 55%);
+      transition: opacity 0.3s;
+    }
+    .svc-diagnostic:hover::before { opacity: 2; }
+    .svc-diag-left { display: flex; align-items: center; gap: 24px; position: relative; z-index: 1; }
+    .svc-diag-badge {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--red); border: 1px solid rgba(232,21,14,0.5); padding: 6px 14px; border-radius: 2px;
+      white-space: nowrap;
+    }
+    .svc-free-tag {
+      position: absolute; top: 20px; right: 20px;
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--red); border: 1px solid rgba(232,21,14,0.5); padding: 4px 10px; border-radius: 2px;
+    }
+
+    /* ===== PHOTO BANNER (parallax) ===== */
+    .photo-banner {
+      position: relative; height: 65vh; min-height: 420px;
+      overflow: hidden; display: flex; align-items: center; justify-content: center;
+    }
+    .photo-banner-bg {
+      position: absolute; inset: -10%;
+      background: url('assets/bg4.jpg') center/cover no-repeat;
+      will-change: transform;
+      transition: transform 0.1s linear;
+    }
+    .photo-banner::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(232,21,14,0.35) 0%, rgba(0,0,0,0.82) 60%);
+    }
+    .photo-banner-content {
+      position: relative; z-index: 2;
+      text-align: center; padding: 0 24px; max-width: 800px;
+    }
+    .photo-banner-quote {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.6rem, 4.5vw, 3.2rem);
+      font-weight: 900; color: white; line-height: 1.1; letter-spacing: -1px;
+      margin-bottom: 20px;
+    }
+    .photo-banner-quote span { color: var(--red); }
+    .photo-banner-sub { font-size: 0.95rem; color: rgba(255,255,255,0.55); letter-spacing: 1px; margin-bottom: 36px; }
+
+    /* ===== BEFORE & AFTER ===== */
+    #before-after { padding: 112px 48px; background: var(--bg); }
+    .ba-header { margin-bottom: 60px; }
+    .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
+    .ba-card { position: relative; overflow: hidden; aspect-ratio: 3/5; }
+    .ba-card img {
+      width: 100%; height: 100%; object-fit: cover; object-position: center 42%; display: block;
+      transition: transform 0.7s cubic-bezier(0.16,1,0.3,1), filter 0.7s;
+      filter: brightness(0.55) saturate(0.6);
+    }
+    .ba-card:hover img { transform: scale(1.04); filter: brightness(0.8) saturate(1); }
+    .ba-tag {
+      position: absolute; top: 22px; left: 22px; z-index: 3;
+      font-family: 'Orbitron', sans-serif; font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 3px; text-transform: uppercase; padding: 7px 16px; border-radius: 2px;
+    }
+    .ba-tag.before { background: rgba(0,0,0,0.75); color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.15); }
+    .ba-tag.after { background: var(--red); color: white; }
+    .ba-gradient { position: absolute; inset: 0; z-index: 1; background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, transparent 52%); }
+    .ba-text { position: absolute; bottom: 32px; left: 28px; right: 28px; z-index: 2; }
+    .ba-title { font-family: 'Orbitron', sans-serif; font-size: 1rem; font-weight: 700; color: white; letter-spacing: 1px; margin-bottom: 8px; }
+    .ba-desc { font-size: 0.82rem; color: rgba(255,255,255,0.5); line-height: 1.6; }
+
+    /* ===== GALLERY ===== */
+    #gallery { background: var(--bg-card); padding-top: 112px; padding-bottom: 112px; }
+    .gallery-top { margin-bottom: 52px; }
+    .gallery-mosaic {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-auto-rows: 60px;
+      gap: 3px;
+    }
+    .g-item { overflow: hidden; position: relative; background: var(--bg-card2); cursor: pointer; }
+    .g-item img { width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block; transition: transform 0.65s cubic-bezier(0.16,1,0.3,1), filter 0.65s; filter: brightness(0.85); }
+    .g-item:hover img { transform: scale(1.06); filter: brightness(1); }
+    /* Per-item focus points */
+    .g-item:nth-child(1) img { object-position: center 45%; } /* 4Runner front red */
+    .g-item:nth-child(2) img { object-position: center 50%; } /* 4Runner rear red */
+    .g-item:nth-child(3) img { object-position: center 55%; } /* 4Runner teal */
+    .g-item:nth-child(4) img { object-position: center 40%; } /* Mustang original radio */
+    .g-item:nth-child(5) img { object-position: center 40%; } /* Mustang Kenwood */
+    .g-item:nth-child(6) img { object-position: center 35%; } /* Speaker hand */
+    .g-item:nth-child(7) img { object-position: center 45%; } /* Roush Mustang CarPlay */
+    .g-item .g-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(232,21,14,0.25) 0%, transparent 60%); opacity: 0; transition: opacity 0.4s; }
+    .g-item:hover .g-overlay { opacity: 1; }
+
+    /* mosaic positions — 7 items */
+    .g-item:nth-child(1) { grid-column: 1 / 8; grid-row: 1 / 9; }    /* large left */
+    .g-item:nth-child(2) { grid-column: 8 / 13; grid-row: 1 / 5; }   /* top right */
+    .g-item:nth-child(3) { grid-column: 8 / 13; grid-row: 5 / 9; }   /* mid right */
+    .g-item:nth-child(4) { grid-column: 1 / 5; grid-row: 9 / 14; }   /* bot left small */
+    .g-item:nth-child(5) { grid-column: 5 / 9; grid-row: 9 / 14; }   /* bot center */
+    .g-item:nth-child(6) { grid-column: 9 / 13; grid-row: 9 / 14; }  /* bot right */
+    .g-item:nth-child(7) { grid-column: 1 / 13; grid-row: 14 / 19; } /* full width bottom */
+
+    /* placeholder if no image */
+    .g-placeholder {
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-dim); font-size: 0.75rem; letter-spacing: 1px; text-align: center; padding: 12px;
+    }
+
+    /* ===== CONTACT ===== */
+    #contact .contact-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 96px; align-items: start; }
+    .contact-left {}
+    .contact-items { display: flex; flex-direction: column; gap: 28px; margin-top: 48px; }
+    .c-item { display: flex; align-items: center; gap: 20px; }
+    .c-icon {
+      width: 46px; height: 46px; border-radius: 6px; flex-shrink: 0;
+      background: var(--red-dim); border: 1px solid rgba(232,21,14,0.2);
+      display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    }
+    .c-text a { color: var(--white); text-decoration: none; font-size: 1.05rem; font-weight: 500; transition: color 0.2s; }
+    .c-text a:hover { color: var(--red); }
+    .c-text p { font-size: 0.78rem; color: var(--text-dim); margin-top: 3px; letter-spacing: 0.5px; }
+
+    .cta-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 6px; padding: 52px 44px; position: relative; overflow: hidden;
+    }
+    .cta-card::before {
+      content: ''; position: absolute; top: -80px; right: -80px;
+      width: 250px; height: 250px; background: var(--red-dim); border-radius: 50%; filter: blur(70px);
+    }
+    .cta-card h3 { font-family: 'Orbitron', sans-serif; font-size: 1.7rem; font-weight: 700; color: var(--white); line-height: 1.2; margin-bottom: 16px; }
+    .cta-card p { color: var(--text-dim); line-height: 1.7; margin-bottom: 36px; font-size: 0.95rem; }
+    .cta-card .free-badge {
+      display: inline-block; background: rgba(232,21,14,0.12); border: 1px solid rgba(232,21,14,0.3);
+      color: var(--red); font-size: 0.72rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+      padding: 5px 14px; border-radius: 2px; margin-bottom: 24px;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: #040404; border-top: 1px solid var(--border);
+      padding: 36px 48px;
+    }
+    .footer-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
+    }
+    .footer-logo { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; font-weight: 900; color: var(--white); }
+    .footer-logo span { color: var(--red); }
+    .footer-copy { font-size: 0.78rem; color: var(--text-dim); }
+    .footer-ig a { color: var(--text-dim); text-decoration: none; font-size: 0.82rem; letter-spacing: 1px; transition: color 0.2s; }
+    .footer-ig a:hover { color: var(--red); }
+
+    /* ===== SCROLL ANIMATIONS ===== */
+    .reveal        { opacity:0; transform:translateY(40px); transition: opacity 0.75s cubic-bezier(0.16,1,0.3,1), transform 0.75s cubic-bezier(0.16,1,0.3,1); }
+    .reveal-left   { opacity:0; transform:translateX(-45px); transition: opacity 0.75s cubic-bezier(0.16,1,0.3,1), transform 0.75s cubic-bezier(0.16,1,0.3,1); }
+    .reveal-right  { opacity:0; transform:translateX(45px); transition: opacity 0.75s cubic-bezier(0.16,1,0.3,1), transform 0.75s cubic-bezier(0.16,1,0.3,1); }
+    .reveal.in, .reveal-left.in, .reveal-right.in { opacity:1; transform:none; }
+
+    .stagger > * {
+      opacity:0; transform:translateY(30px);
+      transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1);
+    }
+    .stagger.in > *:nth-child(1)  { opacity:1;transform:none;transition-delay:0.00s; }
+    .stagger.in > *:nth-child(2)  { opacity:1;transform:none;transition-delay:0.07s; }
+    .stagger.in > *:nth-child(3)  { opacity:1;transform:none;transition-delay:0.14s; }
+    .stagger.in > *:nth-child(4)  { opacity:1;transform:none;transition-delay:0.21s; }
+    .stagger.in > *:nth-child(5)  { opacity:1;transform:none;transition-delay:0.28s; }
+    .stagger.in > *:nth-child(6)  { opacity:1;transform:none;transition-delay:0.35s; }
+    .stagger.in > *:nth-child(7)  { opacity:1;transform:none;transition-delay:0.42s; }
+    .stagger.in > *:nth-child(8)  { opacity:1;transform:none;transition-delay:0.49s; }
+    .stagger.in > *:nth-child(9)  { opacity:1;transform:none;transition-delay:0.56s; }
+
+    /* ===== RESPONSIVE ===== */
+    @media(max-width:960px) {
+      nav { padding: 0 24px; }
+      .nav-links { display:none; }
+      .nav-toggle { display:flex; }
+      section { padding: 80px 24px; }
+      #before-after { padding: 80px 24px; }
+      .divider-bar { padding: 40px 24px; }
+      .services-grid { grid-template-columns: repeat(2, 1fr); }
+      #contact .contact-wrap { grid-template-columns: 1fr; gap: 48px; }
+      .bar-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .bar-item:last-child { border-bottom: none; }
+      .bar-grid { grid-template-columns: repeat(2, 1fr); }
+      .ba-card { aspect-ratio: 4/5; }
+    }
+    @media(max-width:640px) {
+      h1.hero-title { letter-spacing:-2px; }
+      .hero-actions { flex-direction:column; align-items:center; }
+      .services-grid { grid-template-columns: 1fr; }
+      .g-item:nth-child(1) { grid-column: 1/-1; grid-row: 1/7; }
+      .g-item:nth-child(2) { grid-column: 1/7; grid-row: 7/12; }
+      .g-item:nth-child(3) { grid-column: 7/-1; grid-row: 7/12; }
+      .g-item:nth-child(4) { grid-column: 1/-1; grid-row: 12/17; }
+      .g-item:nth-child(5) { grid-column: 1/-1; grid-row: 17/22; }
+      .g-item:nth-child(6) { grid-column: 1/7; grid-row: 22/27; }
+      .g-item:nth-child(7) { grid-column: 7/-1; grid-row: 22/27; }
+      .cta-card { padding: 36px 28px; }
+      .footer-inner { flex-direction:column; text-align:center; }
+      .ba-grid { grid-template-columns: 1fr; }
+      .ba-card { aspect-ratio: 4/5; }
+      .photo-banner { height: 55vh; }
+    }
+    @media(prefers-reduced-motion:reduce) {
+      .reveal,.reveal-left,.reveal-right,.stagger>* { transition:none; opacity:1; transform:none; }
+      .hero-glow { animation:none; }
+      .scroll-bar { animation:none; }
+    }
+
+    /* ===== WHATSAPP FLOAT ===== */
+    .wa-float {
+      position: fixed; bottom: 28px; right: 28px; z-index: 999;
+      display: flex; align-items: center; gap: 12px;
+      text-decoration: none;
+      animation: wa-bounce 3s ease infinite;
+    }
+    @keyframes wa-bounce {
+      0%,100%  { transform: translateY(0);   }
+      50%      { transform: translateY(-6px); }
+    }
+    .wa-btn {
+      width: 58px; height: 58px; border-radius: 50%;
+      background: #25D366;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(37,211,102,0.45), 0 0 0 0 rgba(37,211,102,0.4);
+      animation: wa-pulse 2.5s ease infinite;
+      flex-shrink: 0;
+    }
+    @keyframes wa-pulse {
+      0%  { box-shadow: 0 4px 20px rgba(37,211,102,0.45), 0 0 0 0 rgba(37,211,102,0.4); }
+      70% { box-shadow: 0 4px 20px rgba(37,211,102,0.45), 0 0 0 14px rgba(37,211,102,0); }
+      100%{ box-shadow: 0 4px 20px rgba(37,211,102,0.45), 0 0 0 0 rgba(37,211,102,0); }
+    }
+    .wa-btn svg { width: 30px; height: 30px; fill: white; }
+    .wa-label {
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: white; font-size: 0.8rem; font-weight: 600;
+      padding: 8px 16px; border-radius: 24px;
+      white-space: nowrap; letter-spacing: 0.5px;
+      opacity: 0; transform: translateX(10px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+    }
+    .wa-float:hover .wa-label { opacity: 1; transform: translateX(0); }
+    .wa-float:hover .wa-btn { background: #1ebe5d; }
+
+    /* Mobile nav overlay */
+    .mobile-menu {
+      display:none; position:fixed; top:68px; left:0; right:0; z-index:199;
+      background:rgba(8,8,8,0.97); backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--border); padding:24px 24px 32px;
+      flex-direction:column; gap:24px;
+    }
+    .mobile-menu.open { display:flex; }
+    .mobile-menu a { color:var(--text); text-decoration:none; font-size:1rem; font-weight:500; letter-spacing:1px; padding:8px 0; border-bottom:1px solid var(--border); }
+    .mobile-menu a:last-child { border-bottom:none; color:var(--red); }
+  </style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">Ds<span>Audio</span></a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="tel:5209794376" class="nav-cta">Call Now</a></li>
+  </ul>
+  <div class="nav-toggle" id="navToggle" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#services" onclick="closeMobile()">Services</a>
+  <a href="#gallery" onclick="closeMobile()">Gallery</a>
+  <a href="#contact" onclick="closeMobile()">Contact</a>
+  <a href="tel:5209794376">📞 (520) 979-4376</a>
+</div>
+
+<!-- ============ HERO — Video Scroll ============ -->
+<div class="hero-scroll-video" id="heroScrollZone">
+  <div class="hero-sticky" id="heroSticky">
+    <video class="hero-video" id="heroVideo"
+      playsinline muted preload="auto">
+      <source src="assets/hero-main.mov" type="video/mp4">
+    </video>
+
+    <div class="hero-content" id="hero">
+      <div class="hero-eyebrow">
+        <div class="hero-eyebrow-dot"></div>
+        <span>Car Audio &amp; Electronics</span>
+      </div>
+      <h1 class="hero-title">
+        SOUND.<br>
+        LIGHTS.<br>
+        <span class="accent">POWER.</span>
+      </h1>
+      <p class="hero-sub">
+        Professional installation of audio systems, lighting,<br>
+        screens, alarms &amp; amplifiers for your vehicle.
+      </p>
+      <div class="hero-actions">
+        <a href="tel:5209794376" class="btn-primary">Get a Quote</a>
+        <a href="#services" class="btn-ghost">Our Services</a>
+      </div>
+      <div class="hero-scroll-hint" style="position:absolute;bottom:48px;left:50%;transform:translateX(-50%);">
+        <p>Scroll</p>
+        <div class="scroll-bar"></div>
+      </div>
+    </div>
+
+    <div class="hero-progress">
+      <div class="hero-progress-fill" id="heroPF"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ NUMBERS BAR ============ -->
+<div class="divider-bar">
+  <div class="container">
+    <div class="bar-grid stagger">
+      <div class="bar-item">
+        <div class="bar-num"><span class="ctr" data-target="9">0</span></div>
+        <div class="bar-label">Services Available</div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-num" style="font-size:clamp(1.4rem,3vw,2.2rem); color:#fff;">FREE</div>
+        <div class="bar-label">Diagnostic &amp; Scanner</div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-num"><span class="ctr" data-target="100">0</span>%</div>
+        <div class="bar-label">Custom Installs</div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-num" style="font-size:clamp(1.4rem,3vw,2.2rem); color:#fff;">PRO</div>
+        <div class="bar-label">Grade Equipment</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SERVICES ============ -->
+<section id="services">
+  <div class="container">
+    <div class="services-top">
+      <div class="reveal">
+        <span class="section-tag">What We Do</span>
+        <h2 class="section-title">Our Services</h2>
+        <p class="section-body">Professional vehicle electronics — from premium audio builds to smart lighting and security. Every install is clean, custom, and built to last.</p>
+      </div>
+    </div>
+    <div class="services-grid stagger">
+
+      <!-- PHOTO: Radio Screen -->
+      <div class="svc-photo">
+        <img src="assets/svc-screen.jpg" alt="Radio Screen upgrade" style="object-position: center 50%;">
+        <div class="svc-photo-overlay"></div>
+        <div class="svc-photo-body">
+          <div class="svc-photo-icon">📺</div>
+          <div class="svc-name">Radio Screen</div>
+          <div class="svc-desc">Apple CarPlay, Android Auto, Bluetooth — complete head unit upgrade seamlessly integrated into your dash.</div>
+        </div>
+      </div>
+
+      <!-- PHOTO: Lighting -->
+      <div class="svc-photo">
+        <img src="assets/svc-lighting.jpg" alt="Interior and exterior lighting" style="object-position: center 62%;">
+        <div class="svc-photo-overlay"></div>
+        <div class="svc-photo-body">
+          <div class="svc-photo-icon">💡</div>
+          <div class="svc-name">Interior &amp; Exterior Lighting</div>
+          <div class="svc-desc">RGB underglow, wheel well lights, ambient interior lighting — full color control, day and night.</div>
+        </div>
+      </div>
+
+      <!-- PHOTO: Amplifier -->
+      <div class="svc-photo">
+        <img src="assets/svc-amp.jpg" alt="Amplifier installation" style="object-position: center 68%;">
+        <div class="svc-photo-overlay"></div>
+        <div class="svc-photo-body">
+          <div class="svc-photo-icon">⚡</div>
+          <div class="svc-name">Amplifier</div>
+          <div class="svc-desc">Professional amp install and tuning — clean, powerful, distortion-free sound across your full system.</div>
+        </div>
+      </div>
+
+      <!-- PHOTO: Speakers -->
+      <div class="svc-photo">
+        <img src="assets/svc-speaker.jpg" alt="Speaker upgrade" style="object-position: center 38%;">
+        <div class="svc-photo-overlay"></div>
+        <div class="svc-photo-body">
+          <div class="svc-photo-icon">🔈</div>
+          <div class="svc-name">Speakers</div>
+          <div class="svc-desc">Component and coaxial upgrades — real clarity, depth, and soundstage your stock audio never had.</div>
+        </div>
+      </div>
+
+      <!-- ICON: Dash Cam -->
+      <div class="svc-card">
+        <div class="svc-icon">📹</div>
+        <div class="svc-name">Dash Cam</div>
+        <div class="svc-desc">Front and rear dash cam installation with discreet hardwired routing — clean and permanent.</div>
+      </div>
+
+      <!-- ICON: Radar Detector -->
+      <div class="svc-card">
+        <div class="svc-icon">📡</div>
+        <div class="svc-name">Radar Detector</div>
+        <div class="svc-desc">Hardwired radar detector install — always on, no cords dangling, seamlessly built into your dash.</div>
+      </div>
+
+      <!-- ICON: Bass -->
+      <div class="svc-card">
+        <div class="svc-icon">🔊</div>
+        <div class="svc-name">Bass &amp; Subwoofer</div>
+        <div class="svc-desc">Custom subwoofer boxes and bass setups tuned to your vehicle. Feel every note the way it was meant to be heard.</div>
+      </div>
+
+      <!-- ICON: Reverse Camera -->
+      <div class="svc-card">
+        <div class="svc-icon">📷</div>
+        <div class="svc-name">Reverse Camera</div>
+        <div class="svc-desc">Backup camera integration displayed on your screen — safer parking and reversing every time.</div>
+      </div>
+
+      <!-- FEATURED: Free Diagnostic -->
+      <div class="svc-diagnostic">
+        <div class="svc-diag-left">
+          <div class="svc-diag-badge">✓ FREE</div>
+          <div>
+            <div class="svc-name" style="margin-bottom:6px;">Audio Diagnostic &amp; Scanner</div>
+            <div class="svc-desc" style="max-width:480px;">Come in for a free audio system diagnostic and OBD scanner check — no pressure, no cost. Just answers about your vehicle.</div>
+          </div>
+        </div>
+        <a href="tel:5209794376" class="btn-primary" style="flex-shrink:0;">Book Now — It's Free</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ PHOTO BANNER ============ -->
+<div class="photo-banner" id="photoBanner">
+  <div class="photo-banner-bg" id="bannerBg"></div>
+  <div class="photo-banner-content reveal">
+    <h2 class="photo-banner-quote">
+      Life's too short to<br><span>drive boring cars.</span>
+    </h2>
+    <p class="photo-banner-sub">Every detail matters — from the first wire to the final tune.</p>
+    <a href="tel:5209794376" class="btn-primary">Start Your Build</a>
+  </div>
+</div>
+
+<!-- ============ BEFORE & AFTER ============ -->
+<section id="before-after">
+  <div class="container">
+    <div class="ba-header reveal">
+      <span class="section-tag">The Difference</span>
+      <h2 class="section-title">Before &amp; After</h2>
+      <p class="section-body">See the transformation. One visit to DsAudio and your interior goes from stock to stunning.</p>
+    </div>
+    <div class="ba-grid stagger">
+      <div class="ba-card">
+        <img src="assets/bg1.jpg" alt="Mustang stock factory radio — before"
+          onerror="this.style.display='none';this.parentElement.style.background='#161616';this.parentElement.innerHTML+='<div style=\'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#555;font-size:0.75rem;\'>📁 assets/bg1.jpg</div>'">
+        <div class="ba-tag before">Before</div>
+        <div class="ba-gradient"></div>
+        <div class="ba-text">
+          <div class="ba-title">Factory Setup</div>
+          <div class="ba-desc">Stock radio, small screen, limited functionality — missing everything modern audio has to offer.</div>
+        </div>
+      </div>
+      <div class="ba-card">
+        <img src="assets/bg2.jpg" alt="Mustang with Kenwood Apple CarPlay screen — after"
+          onerror="this.style.display='none';this.parentElement.style.background='#161616';this.parentElement.innerHTML+='<div style=\'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#555;font-size:0.75rem;\'>📁 assets/bg2.jpg</div>'">
+        <div class="ba-tag after">After</div>
+        <div class="ba-gradient"></div>
+        <div class="ba-text">
+          <div class="ba-title">DsAudio Upgrade</div>
+          <div class="ba-desc">Kenwood touchscreen, Apple CarPlay, seamless integration — a completely different driving experience.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GALLERY ============ -->
+<section id="gallery">
+  <div class="container">
+    <div class="gallery-top reveal">
+      <span class="section-tag">Our Work</span>
+      <h2 class="section-title">Built Different</h2>
+      <p class="section-body">Every install is custom. See what we've done for vehicles just like yours.</p>
+    </div>
+    <div class="gallery-mosaic stagger">
+
+      <div class="g-item">
+        <img src="assets/car1.jpg" alt="Toyota 4Runner red wheel well lighting"
+          onerror="this.style.display='none';this.parentElement.classList.add('g-placeholder');this.parentElement.innerHTML='<span>📁 Guarda tu foto como<br><strong>assets/car1.jpg</strong></span>'">
+        <div class="g-overlay"></div>
+      </div>
+
+      <div class="g-item">
+        <img src="assets/car2.jpg" alt="Toyota 4Runner rear red lighting"
+          onerror="this.style.display='none';this.parentElement.classList.add('g-placeholder');this.parentElement.innerHTML='<span>📁 Guarda tu foto como<br><strong>assets/car2.jpg</strong></span>'">
+        <div class="g-overlay"></div>
+      </div>
+
+      <div class="g-item">
+        <img src="assets/car3.jpg" alt="Toyota 4Runner teal underglow"
+          onerror="this.style.display='none';this.parentElement.classList.add('g-placeholder');this.parentElement.innerHTML='<span>📁 Guarda tu foto como<br><strong>assets/car3.jpg</strong></span>'">
+        <div class="g-overlay"></div>
+      </div>
+
+      <div class="g-item">
+        <img src="assets/interior1.jpg" alt="Mustang interior lighting"
+          onerror="this.style.display='none';this.parentElement.classList.add('g-placeholder');this.parentElement.innerHTML='<span>📁 Guarda tu foto como<br><strong>assets/interior1.jpg</strong></span>'">
+        <div class="g-overlay"></div>
+      </div>
+
+      <div class="g-item">
+        <img src="assets/interior2.jpg" alt="Mustang Kenwood screen upgrade"
+          onerror="this.style.display='none';this.parentElement.classList.add('g-placeholder');this.parentElement.innerHTML='<span>📁 assets/interior2.jpg</span>'">
+        <div class="g-overlay"></div>
+      </div>
+
+      <div class="g-item">
+        <img src="assets/svc-speaker.jpg" alt="Kicker speaker install"
+          onerror="this.style.display='none';this.parentElement.classList.add('g-placeholder');this.parentElement.innerHTML='<span>📁 assets/svc-speaker.jpg</span>'">
+        <div class="g-overlay"></div>
+      </div>
+
+      <div class="g-item">
+        <img src="assets/svc-carplay.jpg" alt="Roush Mustang Sony Apple CarPlay install"
+          onerror="this.style.display='none';this.parentElement.classList.add('g-placeholder');this.parentElement.innerHTML='<span>📁 assets/svc-carplay.jpg</span>'">
+        <div class="g-overlay"></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section id="contact">
+  <div class="container">
+    <div class="contact-wrap">
+
+      <div class="contact-left reveal-left">
+        <span class="section-tag">Get In Touch</span>
+        <h2 class="section-title">Ready to Upgrade Your Ride?</h2>
+        <p class="section-body">Call or DM us on Instagram to get a quote. We'll build your vehicle exactly how you imagined it.</p>
+        <div class="contact-items">
+          <div class="c-item">
+            <div class="c-icon">📞</div>
+            <div class="c-text">
+              <a href="tel:5209794376">(520) 979-4376</a>
+              <p>Call or text anytime</p>
+            </div>
+          </div>
+          <div class="c-item">
+            <div class="c-icon">📸</div>
+            <div class="c-text">
+              <a href="https://instagram.com/audio__ds" target="_blank" rel="noopener noreferrer">@audio__ds</a>
+              <p>Follow us on Instagram</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal-right">
+        <div class="cta-card">
+          <div class="free-badge">✓ No Cost</div>
+          <h3>Free Diagnostic Included</h3>
+          <p>Not sure what your vehicle needs? Bring it in for a free audio diagnostic and OBD scanner check. No commitment required.</p>
+          <a href="tel:5209794376" class="btn-primary">Call (520) 979-4376</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Ds<span>Audio</span></div>
+    <div class="footer-copy">© 2026 DsAudio. All rights reserved.</div>
+    <div class="footer-ig"><a href="https://instagram.com/audio__ds" target="_blank" rel="noopener">Instagram: @audio__ds</a></div>
+  </div>
+</footer>
+
+<!-- ============ WHATSAPP FLOAT ============ -->
+<a class="wa-float" href="https://wa.me/15209794376" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp">
+  <span class="wa-label">Chat on WhatsApp</span>
+  <div class="wa-btn">
+    <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+      <path d="M16.004 2.667C8.64 2.667 2.667 8.64 2.667 16c0 2.347.64 4.56 1.76 6.467L2.667 29.333l7.04-1.733A13.227 13.227 0 0 0 16.004 29.333C23.36 29.333 29.333 23.36 29.333 16S23.36 2.667 16.004 2.667zm0 24c-1.92 0-3.76-.507-5.36-1.387l-.373-.213-3.947.973.987-3.84-.24-.387A10.573 10.573 0 0 1 5.333 16c0-5.88 4.787-10.667 10.667-10.667S26.667 10.12 26.667 16 21.88 26.667 16 26.667zm5.84-7.987c-.32-.16-1.893-.933-2.187-1.04-.293-.107-.507-.16-.72.16-.213.32-.827 1.04-.987 1.227-.173.187-.347.213-.64.053-.32-.16-1.333-.493-2.533-1.56-.947-.827-1.573-1.853-1.76-2.173-.187-.32-.013-.48.133-.64.133-.133.32-.347.48-.52.133-.16.187-.28.28-.467.093-.187.04-.36-.013-.52-.053-.16-.72-1.733-.987-2.373-.267-.627-.547-.533-.72-.533h-.6c-.213 0-.547.08-.827.4-.293.32-1.093 1.067-1.093 2.6s1.12 3.013 1.28 3.213c.16.187 2.2 3.36 5.333 4.72.747.32 1.32.507 1.773.653.747.24 1.413.2 1.947.12.6-.093 1.84-.747 2.107-1.48.253-.72.253-1.333.173-1.467-.08-.133-.28-.213-.587-.373z"/>
+    </svg>
+  </div>
+</a>
+
+<script>
+// ---- Nav scroll ----
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 60), {passive:true});
+
+// ---- Mobile menu ----
+const menu = document.getElementById('mobileMenu');
+document.getElementById('navToggle').addEventListener('click', () => menu.classList.toggle('open'));
+function closeMobile() { menu.classList.remove('open'); }
+
+// ---- IntersectionObserver for animations ----
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const el = entry.target;
+    el.classList.add('in');
+    el.querySelectorAll('.ctr').forEach(startCounter);
+    io.unobserve(el);
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .stagger').forEach(el => io.observe(el));
+
+// ---- Counter animation ----
+function startCounter(el) {
+  const target = parseInt(el.dataset.target);
+  const dur = 1600;
+  const t0 = performance.now();
+  (function tick(now) {
+    const p = Math.min((now - t0) / dur, 1);
+    const e = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(e * target);
+    if (p < 1) requestAnimationFrame(tick);
+  })(performance.now());
+}
+
+// ---- Parallax photo banner ----
+(function() {
+  const banner = document.getElementById('photoBanner');
+  const bg = document.getElementById('bannerBg');
+  if (!banner || !bg) return;
+  window.addEventListener('scroll', () => {
+    const rect = banner.getBoundingClientRect();
+    if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+    const center = rect.top + rect.height / 2 - window.innerHeight / 2;
+    bg.style.transform = `translateY(${center * 0.2}px)`;
+  }, {passive:true});
+})();
+
+// ---- Scroll-driven video ----
+(function() {
+  const video = document.getElementById('heroVideo');
+  const zone  = document.getElementById('heroScrollZone');
+  const pf    = document.getElementById('heroPF');
+  if (!video || !zone) return;
+
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  const reduced  = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (isMobile || reduced) {
+    video.autoplay = true; video.loop = true;
+    video.play().catch(() => {});
+    // collapse the scroll zone so mobile doesn't have 500vh dead space
+    zone.style.height = '100vh';
+    return;
+  }
+
+  video.pause();
+  video.currentTime = 0;
+  let ready = false;
+  video.addEventListener('loadedmetadata', () => { ready = true; });
+  video.load();
+
+  let ticking = false;
+  function update() {
+    if (!ready || !video.duration) return;
+    const rect = zone.getBoundingClientRect();
+    const scrolled  = -rect.top;
+    const scrollable = zone.offsetHeight - window.innerHeight;
+    if (scrolled <= 0) {
+      video.currentTime = 0;
+      if (pf) pf.style.width = '0%';
+      return;
+    }
+    if (scrolled >= scrollable) {
+      video.currentTime = video.duration;
+      if (pf) pf.style.width = '100%';
+      return;
+    }
+    const p = scrolled / scrollable;
+    video.currentTime = p * video.duration;
+    if (pf) pf.style.width = (p * 100) + '%';
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) { requestAnimationFrame(() => { update(); ticking = false; }); ticking = true; }
+  }, {passive: true});
+  window.addEventListener('resize', update);
+})();
+</script>
+
+</body>
+</html>
