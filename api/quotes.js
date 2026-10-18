@@ -1,4 +1,6 @@
 import { randomBytes } from 'node:crypto';
+import { put, del } from '@vercel/blob';
+import { readImage } from './_lib/image.js';
 import { isAuthed, json } from './_lib/auth.js';
 import { PREFIX } from './_lib/store.js';
 import { readRecord, writeRecord, deleteRecord, readAllRecords } from './_lib/records.js';
@@ -6,6 +8,9 @@ import { readRecord, writeRecord, deleteRecord, readAllRecords } from './_lib/re
 // Quote requests sent from the site's quote form, and the estimates built for them in /panel
 const QUOTES = PREFIX + 'cotizaciones-data';
 const SETTINGS = PREFIX + 'cotizaciones-ajustes';
+// Seller's signature for the warranty page. The repo is public, so it lives only in Blob
+// (random, unlisted URL) and is handed out through this API to signed-in panel users.
+const SIGNATURE = PREFIX + 'firma/';
 const MAX_ITEMS = 30;
 
 export const DEFAULT_SETTINGS = {
@@ -80,10 +85,18 @@ export async function POST(request) {
 // Panel: all quote requests (newest first) and the PDF business details
 export async function GET(request) {
   if (!isAuthed(request)) return json({ error: 'Sesión expirada. Vuelve a iniciar sesión.' }, 401);
+  if (new URL(request.url).searchParams.has('signature')) {
+    const st = await readRecord(SETTINGS);
+    if (!st?.signatureUrl) return json({ error: 'Sin firma' }, 404);
+    const img = await fetch(st.signatureUrl);
+    if (!img.ok) return json({ error: 'Sin firma' }, 404);
+    return new Response(await img.arrayBuffer(), { headers: { 'content-type': 'image/png', 'cache-control': 'private, no-store' } });
+  }
   try {
-    const [quotes, settings] = await Promise.all([readAllRecords(QUOTES), readRecord(SETTINGS)]);
+    const [quotes, saved] = await Promise.all([readAllRecords(QUOTES), readRecord(SETTINGS)]);
     quotes.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-    return json({ quotes, settings: { ...DEFAULT_SETTINGS, ...(settings || {}) } });
+    const { signatureUrl, ...settings } = { ...DEFAULT_SETTINGS, ...(saved || {}) };
+    return json({ quotes, settings: { ...settings, hasSignature: !!signatureUrl } });
   } catch (e) {
     console.error(e);
     return json({ error: 'No se pudieron cargar las cotizaciones' }, 500);
@@ -105,18 +118,22 @@ function cleanEstimate(e) {
 export async function PUT(request) {
   if (!isAuthed(request)) return json({ error: 'Sesión expirada. Vuelve a iniciar sesión.' }, 401);
   const url = new URL(request.url);
+  if (url.searchParams.has('signature')) return saveSignature(request);
   let b;
   try { b = await request.json(); } catch { return json({ error: 'Datos inválidos' }, 400); }
   try {
     if (url.searchParams.has('settings')) {
+      const prev = await readRecord(SETTINGS);
       const s = {
+        signatureUrl: prev?.signatureUrl || '',
         business: text(b.business, 40) || DEFAULT_SETTINGS.business,
         phone: text(b.phone, 30), email: text(b.email, 80), instagram: text(b.instagram, 40), facebook: text(b.facebook, 40),
         validDays: Math.max(1, Math.min(365, parseInt(b.validDays, 10) || 15)),
         taxRate: rate(b.taxRate, DEFAULT_SETTINGS.taxRate),
         warranty: text(b.warranty, 3000),
       };
-      return json(await writeRecord(SETTINGS, s));
+      const { signatureUrl, ...saved } = await writeRecord(SETTINGS, s);
+      return json({ ...saved, hasSignature: !!signatureUrl });
     }
     const id = url.searchParams.get('id');
     if (!validId(id)) return json({ error: 'Cotización inválida' }, 400);
@@ -137,8 +154,32 @@ export async function PUT(request) {
   }
 }
 
+async function saveSignature(request) {
+  const img = await readImage(request);
+  if (img.error) return json({ error: img.error }, img.status);
+  if (img.ext !== 'png') return json({ error: 'La firma debe ser PNG' }, 415);
+  try {
+    const prev = await readRecord(SETTINGS);
+    const blob = await put(SIGNATURE + 'firma.png', img.buf, { access: 'public', contentType: 'image/png', addRandomSuffix: true });
+    await writeRecord(SETTINGS, { ...DEFAULT_SETTINGS, ...(prev || {}), signatureUrl: blob.url });
+    if (prev?.signatureUrl) await del(prev.signatureUrl).catch(() => {});
+    return json({ ok: true, hasSignature: true });
+  } catch (e) {
+    console.error(e);
+    return json({ error: 'No se pudo guardar la firma' }, 500);
+  }
+}
+
 export async function DELETE(request) {
   if (!isAuthed(request)) return json({ error: 'Sesión expirada. Vuelve a iniciar sesión.' }, 401);
+  if (new URL(request.url).searchParams.has('signature')) {
+    const prev = await readRecord(SETTINGS);
+    if (prev?.signatureUrl) {
+      await del(prev.signatureUrl).catch(() => {});
+      await writeRecord(SETTINGS, { ...prev, signatureUrl: '' });
+    }
+    return json({ ok: true, hasSignature: false });
+  }
   const id = new URL(request.url).searchParams.get('id');
   if (!validId(id)) return json({ error: 'Cotización inválida' }, 400);
   try { await deleteRecord(`${QUOTES}/${id}`); return json({ ok: true }); }

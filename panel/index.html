@@ -249,6 +249,9 @@
     .qset h2 { font-size: 1.2rem; font-weight: 700; }
     .qset .hint { margin: 4px 0 16px; }
     .qset .field { margin-bottom: 12px; }
+    .sig-box { display: grid; place-items: center; height: 120px; border: 1.5px dashed var(--line); border-radius: 12px; background: var(--bg); }
+    .sig-box img { max-height: 100px; max-width: 90%; }
+    .sig-actions { display: flex; gap: 8px; margin: 10px 0 6px; flex-wrap: wrap; }
     .qset textarea.input { height: auto; min-height: 150px; padding: 12px 14px; resize: vertical; line-height: 1.5; }
 
     .loading-page { min-height: 60vh; display: grid; place-items: center; color: var(--muted); }
@@ -420,6 +423,15 @@
       <div class="field"><label>Email</label><input class="input" data-st="email" maxlength="80"></div>
       <div class="field"><label>Instagram</label><input class="input" data-st="instagram" maxlength="40"></div>
       <div class="field"><label>Facebook</label><input class="input" data-st="facebook" maxlength="40"></div>
+    </div>
+    <div class="field">
+      <label>Firma del vendedor (sale sobre "Seller's signature" en la garantía)</label>
+      <div class="sig-box"><img id="sigImg" alt="Firma del vendedor" hidden><span id="sigEmpty" class="hint">Sin firma: la línea sale en blanco</span></div>
+      <div class="sig-actions">
+        <label class="btn btn-sm" tabindex="0">Cambiar firma (foto)<input type="file" accept="image/*" id="sigFile" class="file"></label>
+        <button type="button" class="btn btn-sm" id="sigRemove">Quitar firma</button>
+      </div>
+      <p class="hint">Firma con pluma negra en una hoja blanca y tómale foto: el fondo se quita solo.</p>
     </div>
     <div class="field"><label>Garantía (página 2 del PDF; déjala vacía para no incluirla)</label><textarea class="input" data-st="warranty" rows="8" maxlength="3000"></textarea></div>
     <div class="qd-actions">
@@ -1115,14 +1127,55 @@ function openSettings() {
   const s = Q.settings;
   const dlg = $('#qSettings');
   dlg.querySelectorAll('[data-st]').forEach(el => { el.value = s[el.dataset.st] ?? ''; });
+  showSignature(s.hasSignature);
   dlg.showModal();
 }
+function showSignature(has) {
+  $('#sigImg').hidden = !has; $('#sigEmpty').hidden = has; $('#sigRemove').hidden = !has;
+  if (has) $('#sigImg').src = '/api/quotes?signature&t=' + Date.now();
+}
+// Turn a photo of a signature on paper into a clean transparent PNG (dark ink, no background)
+async function cleanSignature(file) {
+  const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
+  const k = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+  const c = document.createElement('canvas');
+  c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+  const g = c.getContext('2d'); g.drawImage(bmp, 0, 0, c.width, c.height);
+  const img = g.getImageData(0, 0, c.width, c.height), d = img.data;
+  let x0 = c.width, y0 = c.height, x1 = 0, y1 = 0;
+  for (let i = 0; i < d.length; i += 4) {
+    const dark = 255 - Math.min(d[i], d[i + 1], d[i + 2]);
+    const a = Math.max(0, Math.min(1, (dark - 60) / 120));
+    d[i] = 20; d[i + 1] = 18; d[i + 2] = 24; d[i + 3] = Math.round(a * 255);
+    if (a > 0.1) { const p = i / 4, x = p % c.width, y = (p / c.width) | 0; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  }
+  if (x1 <= x0 || y1 <= y0) throw new Error('No se encontró la firma en la foto. Usa pluma oscura sobre papel blanco.');
+  g.putImageData(img, 0, 0);
+  const pad = 10, w = x1 - x0 + pad * 2, h = y1 - y0 + pad * 2;
+  const out = document.createElement('canvas'); out.width = w; out.height = h;
+  out.getContext('2d').drawImage(c, x0 - pad, y0 - pad, w, h, 0, 0, w, h);
+  return new Promise(r => out.toBlob(r, 'image/png'));
+}
+$('#sigFile').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try {
+    const png = await cleanSignature(f);
+    await api('/api/quotes?signature', { method: 'PUT', headers: { 'content-type': 'image/png' }, body: png });
+    Q.settings.hasSignature = true; showSignature(true); toast('Firma guardada', 'ok');
+  } catch (err) { toast(err.message, 'bad'); }
+});
+$('#sigRemove').addEventListener('click', async () => {
+  if (!confirm('¿Quitar la firma del vendedor? Los PDF saldrán con la línea en blanco.')) return;
+  try { await api('/api/quotes?signature', { method: 'DELETE' }); Q.settings.hasSignature = false; showSignature(false); toast('Firma quitada'); }
+  catch (err) { toast(err.message, 'bad'); }
+});
 $('#qSettingsForm').addEventListener('submit', async e => {
   e.preventDefault();
   const body = {};
   $('#qSettings').querySelectorAll('[data-st]').forEach(el => { body[el.dataset.st] = el.value; });
   try {
     Q.settings = await api('/api/quotes?settings', { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+    if (Q.settings.hasSignature === undefined) Q.settings.hasSignature = false;
     $('#qSettings').close(); toast('Datos del PDF guardados', 'ok');
   } catch (err) { toast(err.message, 'bad'); }
 });
@@ -1165,7 +1218,10 @@ async function downloadEstimatePdf(q, st) {
   const t = totals(e);
 
   // The 12 Voltec logo files (light version for the cream page, dark version for the black header)
-  const [logoDark, logoLight] = await Promise.all([loadPng('/img/logo-pdf-dark.png'), loadPng('/img/logo-pdf-light.png')]);
+  const [logoDark, logoLight, signature] = await Promise.all([
+    loadPng('/img/logo-pdf-dark.png'), loadPng('/img/logo-pdf-light.png'),
+    st.hasSignature ? loadPng('/api/quotes?signature').catch(() => null) : null,
+  ]);
   function logo(img, cx, cy, h) {
     const w = h * img.w / img.h;
     doc.addImage(img.data, 'PNG', cx - w / 2, cy - h / 2, w, h, img.data.length + '', 'FAST');
@@ -1278,6 +1334,11 @@ async function downloadEstimatePdf(q, st) {
       yy += 30;
     });
     doc.setDrawColor(...INK); doc.setLineWidth(0.8);
+    if (signature) {
+      // Fit inside 230 × 115 (template units), centred on the seller line, resting on it
+      const r = signature.w / signature.h, bw = Math.min(230, 115 * r), bh = bw / r;
+      doc.addImage(signature.data, 'PNG', X(216 - bw / 2), X(1046 - bh), X(bw), X(bh), 'firma', 'FAST');
+    }
     doc.line(X(92), X(1040), X(340), X(1040)); doc.line(X(583), X(1040), X(831), X(1040));
     font('normal', 10, INK);
     txt("Seller's signature", 200, 1062, { align: 'center', charSpace: 0.6 });
