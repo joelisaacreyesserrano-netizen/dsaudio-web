@@ -1147,23 +1147,24 @@ async function downloadEstimatePdf(q, st) {
   const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
   const k = W / 924; // the template was drawn on a 924 × 1308 canvas
   const X = v => v * k;
-  const BLUE = [8, 54, 120], RED = [165, 34, 34], STRIPE = [204, 26, 32], INK = [17, 18, 20];
+  // Same palette as 12voltec.com
+  const INK = [17, 18, 20], INK2 = [42, 44, 48], CREAM = [247, 246, 242], LINE = [227, 225, 219], MUTED = [98, 101, 107], WHITE = [255, 255, 255];
   const poly = (pts, color) => { doc.setFillColor(...color); doc.lines(pts.slice(1).map((p, i) => [X(p[0] - pts[i][0]), X(p[1] - pts[i][1])]), X(pts[0][0]), X(pts[0][1]), [1, 1], 'F', true); };
   const txt = (s, x, y, o = {}) => doc.text(String(s), X(x), X(y), o);
   const font = (style, size, color = INK) => { doc.setFont('helvetica', style); doc.setFontSize(size); doc.setTextColor(...color); };
   const e = q.estimate || { job: '', items: [] };
-  const ORANGE = [242, 84, 27];
+  const ORANGE = [242, 84, 27], ORANGE_INK = [184, 58, 12];
   const t = totals(e);
 
   // 12 Voltec logo: the dark "12" tile with the orange bolt, then the 12/VOLTEC wordmark
-  function logo(cx, cy, wordColor, slashColor, tile) {
+  function logo(cx, cy, wordColor, slashColor, tile, tileColor = INK, numColor = WHITE) {
     font('bold', tile * 0.62, wordColor);
     const parts = ['12', '/', 'VOLTEC'], gap = tile * 0.28, cs = tile * 0.03;
     const widths = parts.map(p => doc.getTextWidth(p) + cs * (p.length - 1));
     const total = tile + gap + widths.reduce((a, b) => a + b, 0);
     const x0 = cx - total / 2, y0 = cy - tile / 2, u = tile / 40;
-    doc.setFillColor(...INK); doc.roundedRect(x0, y0, tile, tile, 11 * u, 11 * u, 'F');
-    font('bold', 17 * u, [255, 255, 255]); doc.text('12', x0 + 6 * u, y0 + 27 * u);
+    doc.setFillColor(...tileColor); doc.roundedRect(x0, y0, tile, tile, 11 * u, 11 * u, 'F');
+    font('bold', 17 * u, numColor); doc.text('12', x0 + 6 * u, y0 + 27 * u);
     doc.setFillColor(...ORANGE);
     const bolt = [[30, 7], [23.5, 21], [28, 21], [26, 33], [34, 17.5], [29.2, 17.5]];
     doc.lines(bolt.slice(1).map((p, i) => [(p[0] - bolt[i][0]) * u, (p[1] - bolt[i][1]) * u]), x0 + bolt[0][0] * u, y0 + bolt[0][1] * u, [1, 1], 'F', true);
@@ -1178,7 +1179,7 @@ async function downloadEstimatePdf(q, st) {
   // Little red glyphs inside the white circles of the contact block
   function contactIcon(label, cx, cy) {
     const u = X(1);
-    doc.setDrawColor(...RED); doc.setFillColor(...RED); doc.setLineWidth(1.4 * u);
+    doc.setDrawColor(...ORANGE); doc.setFillColor(...ORANGE); doc.setLineWidth(1.4 * u);
     if (label === 'Phone:') {
       doc.roundedRect(cx - 4.5 * u, cy - 5.5 * u, 3.4 * u, 4 * u, 1 * u, 1 * u, 'F');
       doc.roundedRect(cx + 1.1 * u, cy + 1.5 * u, 4 * u, 3.4 * u, 1 * u, 1 * u, 'F');
@@ -1190,18 +1191,21 @@ async function downloadEstimatePdf(q, st) {
       doc.roundedRect(cx - 5 * u, cy - 5 * u, 10 * u, 10 * u, 3 * u, 3 * u, 'S');
       doc.circle(cx, cy, 2.4 * u, 'S'); doc.circle(cx + 3 * u, cy - 3 * u, 0.8 * u, 'F');
     } else {
-      font('bold', 13, RED); doc.text('f', cx, cy + 4.5 * u, { align: 'center' });
+      font('bold', 13, ORANGE); doc.text('f', cx, cy + 4.5 * u, { align: 'center' });
     }
   }
 
   // ---- page 1: estimate ----
-  doc.setFillColor(247, 247, 247); doc.rect(0, 0, W, H, 'F');
-  poly([[0, 0], [270, 0], [330, 125], [0, 125]], BLUE);
-  poly([[105, 0], [160, 0], [215, 155], [158, 155]], STRIPE);
-  poly([[345, 0], [924, 0], [924, 205], [450, 205]], RED);
-  logo(X(730), X(100), [255, 255, 255], [255, 255, 255], X(56));
+  doc.setFillColor(...CREAM); doc.rect(0, 0, W, H, 'F');
+  poly([[0, 0], [270, 0], [330, 125], [0, 125]], INK2);
+  poly([[105, 0], [160, 0], [215, 155], [158, 155]], ORANGE);
+  poly([[345, 0], [924, 0], [924, 205], [450, 205]], INK);
+  logo(X(730), X(100), WHITE, ORANGE, X(56), WHITE, INK);
 
-  font('bolditalic', 31, BLUE); txt('ESTIMATED', 103, 290, { charSpace: 4 });
+  // Site-style eyebrow bar + heading
+  doc.setFillColor(...ORANGE); doc.rect(X(103), X(228), X(28), X(4), 'F');
+  font('bold', 9.5, MUTED); txt('12 VOLTEC  ·  CAR AUDIO & ELECTRONICS', 142, 234, { charSpace: 1.2 });
+  font('bold', 31, INK); txt('ESTIMATED', 103, 290, { charSpace: 4 });
   const line = (label, value, y) => { font('bold', 13); txt(label, 103, y); const lw = doc.getTextWidth(label + ' '); font('normal', 13); doc.text(value || '', X(103) + lw, X(y)); };
   line('Customer:', q.name, 333);
   line('Phone:', q.phone, 366);
@@ -1215,7 +1219,7 @@ async function downloadEstimatePdf(q, st) {
 
   // table
   const cols = [[103, 360], [365, 528], [534, 690], [695, 857]];
-  doc.setFillColor(...BLUE);
+  doc.setFillColor(...INK);
   cols.forEach(([a, b]) => doc.rect(X(a), X(519), X(b - a), X(47), 'F'));
   font('bold', 12.5, [255, 255, 255]);
   ['Labor - Parts', 'Amount', 'Price', 'Total'].forEach((h, i) => txt(h, (cols[i][0] + cols[i][1]) / 2, 548, { align: 'center' }));
@@ -1237,13 +1241,18 @@ async function downloadEstimatePdf(q, st) {
       txt(s, (cols[i][0] + cols[i][1]) / 2, mid, { align: 'center' });
     });
     y += rowH;
-    doc.setDrawColor(...BLUE); doc.setLineWidth(X(2)); doc.line(X(103), X(y), X(857), X(y));
+    doc.setDrawColor(...(r === rows.length - 1 ? INK : LINE)); doc.setLineWidth(X(r === rows.length - 1 ? 2.5 : 1.5)); doc.line(X(103), X(y), X(857), X(y));
   });
 
-  font('bold', 17, BLUE); txt(`FINAL TOTAL:  ${money(t.total)}`, 857 - 60, y + 34, { align: 'right' });
+  // FINAL TOTAL with the amount in the brand orange
+  font('bold', 18, ORANGE_INK); const amount = money(t.total); const aw = doc.getTextWidth(amount);
+  txt(amount, 857, y + 38, { align: 'right' });
+  // jsPDF ignores charSpace when right-aligning, so place the label by its real width
+  font('bold', 11, INK); const label = 'FINAL TOTAL', lw = doc.getTextWidth(label) + label.length * 1;
+  doc.text(label, X(857) - aw - X(16) - lw, X(y + 36), { charSpace: 1 });
 
   // contact block
-  poly([[0, 1093], [370, 1093], [432, 1308], [0, 1308]], RED);
+  poly([[0, 1093], [370, 1093], [432, 1308], [0, 1308]], INK);
   font('bold', 14, [255, 255, 255]); txt('Contact information', 180, 1130, { align: 'center' });
   [['Phone:', st.phone], ['Email:', st.email], ['Instagram:', st.instagram], ['Facebook:', st.facebook]]
     .filter(([, v]) => v)
@@ -1254,17 +1263,18 @@ async function downloadEstimatePdf(q, st) {
       font('bold', 11.5, [255, 255, 255]); txt(l, 55, yy);
       const lw = doc.getTextWidth(l + ' '); font('normal', 11.5, [255, 255, 255]); doc.text(v, X(55) + lw, X(yy));
     });
-  font('bolditalic', 9.5, INK); txt(`*Quote Valid for ${st.validDays || 15} days*`, 858, 1278, { align: 'right' });
+  font('bolditalic', 9.5, MUTED); txt(`*Quote Valid for ${st.validDays || 15} days*`, 858, 1278, { align: 'right' });
 
   // ---- page 2: service warranty ----
   if (st.warranty) {
     doc.addPage();
-    doc.setFillColor(247, 247, 247); doc.rect(0, 0, W, H, 'F');
-    poly([[0, 0], [285, 0], [285, 57], [0, 57]], BLUE);
-    poly([[143, 0], [192, 0], [210, 80], [165, 80]], STRIPE);
-    poly([[340, 0], [924, 0], [924, 103], [372, 103]], RED);
+    doc.setFillColor(...CREAM); doc.rect(0, 0, W, H, 'F');
+    poly([[0, 0], [285, 0], [285, 57], [0, 57]], INK2);
+    poly([[143, 0], [192, 0], [210, 80], [165, 80]], ORANGE);
+    poly([[340, 0], [924, 0], [924, 103], [372, 103]], INK);
     logo(W / 2, X(205), INK, ORANGE, X(60));
-    font('bolditalic', 29, STRIPE); txt('SERVICE WARRANTY', 462, 337, { align: 'center' });
+    font('bold', 29, INK); txt('SERVICE WARRANTY', 462, 337, { align: 'center', charSpace: 1 });
+    doc.setFillColor(...ORANGE); doc.rect(X(462 - 20), X(354), X(40), X(4), 'F');
     font('normal', 12.5, INK);
     let yy = 400;
     st.warranty.split(/\n\s*\n/).forEach(par => {
