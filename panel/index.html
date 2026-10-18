@@ -19,7 +19,7 @@
     }
     body { font-family: var(--body); background: var(--bg); color: var(--ink); line-height: 1.5; -webkit-font-smoothing: antialiased; min-height: 100vh; }
     img { display: block; max-width: 100%; }
-    button, input { font: inherit; color: inherit; }
+    button, input, textarea { font: inherit; color: inherit; }
     .wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
     [hidden] { display: none !important; }
 
@@ -129,6 +129,38 @@
     .toast.ok { color: var(--ok); }
     .toast.bad { color: var(--danger); }
 
+    /* ===== TABS ===== */
+    .tabs { display: inline-flex; gap: 4px; padding: 4px; margin-top: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; max-width: 100%; overflow-x: auto; }
+    .tabs button { height: 40px; padding: 0 18px; border: 0; border-radius: 999px; background: transparent; cursor: pointer; font-weight: 600; font-size: 0.88rem; color: var(--muted); white-space: nowrap; }
+    .tabs button[aria-selected="true"] { background: var(--ink); color: #fff; }
+
+    /* ===== CLIENTS ===== */
+    .clients { display: grid; gap: 20px; padding: 24px 0 0; }
+    .client { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+    .client-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+    .client-head h2 { font-size: 1.05rem; font-weight: 600; }
+    .client-tools { display: flex; gap: 6px; }
+    .icon-btn { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--line); background: var(--surface); cursor: pointer; display: grid; place-items: center; }
+    .icon-btn svg { width: 15px; height: 15px; }
+    .icon-btn:hover { border-color: var(--ink); }
+    .icon-btn.del { color: var(--danger); }
+    .icon-btn:disabled { opacity: 0.35; cursor: default; border-color: var(--line); }
+    .client-grid { display: grid; grid-template-columns: 1fr 180px 180px; gap: 18px; margin-top: 14px; align-items: start; }
+    .client-grid .field { margin: 0 0 14px; }
+    textarea.input { height: auto; min-height: 112px; padding: 12px 14px; resize: vertical; line-height: 1.5; }
+    .slot-label { font-size: 0.82rem; font-weight: 600; margin-bottom: 6px; }
+    .slot { position: relative; display: grid; place-items: center; aspect-ratio: 4 / 5; border-radius: 12px; overflow: hidden; cursor: pointer; border: 1.5px dashed #C9C6BE; color: var(--muted); font-size: 0.8rem; font-weight: 600; text-align: center; padding: 8px; transition: border-color 0.2s, background 0.2s, color 0.2s; }
+    .slot svg { width: 22px; height: 22px; margin: 0 auto 4px; }
+    .slot:hover { border-color: var(--accent); color: var(--accent-ink); background: #FFF4EF; }
+    .slot.has { border: 0; padding: 0; }
+    .slot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .slot .chg { position: absolute; left: 8px; right: 8px; bottom: 8px; background: rgba(255,255,255,0.94); color: var(--ink); border-radius: 999px; padding: 6px; font-size: 0.78rem; }
+    .client.missing { border-color: var(--danger); }
+    .add-client { width: 100%; height: 64px; margin: 20px 0 140px; border: 1.5px dashed #C9C6BE; border-radius: var(--radius); background: transparent; cursor: pointer; font-weight: 600; color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .add-client:hover { border-color: var(--accent); color: var(--accent-ink); background: #FFF4EF; }
+    .add-client svg { width: 18px; height: 18px; }
+    .empty { text-align: center; color: var(--muted); padding: 40px 16px; background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius); }
+
     .loading-page { min-height: 60vh; display: grid; place-items: center; color: var(--muted); }
 
     @media (max-width: 720px) {
@@ -140,6 +172,9 @@
       .top-actions .btn { width: 44px; padding: 0; }
       .logo small { display: none; }
       .photos { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .client { padding: 16px; }
+      .client-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .client-grid .client-text { grid-column: 1 / -1; }
       .savebar-inner { flex-direction: column; align-items: stretch; text-align: center; }
       .savebar-actions .btn { flex: 1; }
     }
@@ -155,6 +190,8 @@
   <symbol id="i-plus" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 5v14M5 12h14"/></symbol>
   <symbol id="i-ext" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M7 17 17 7M9 7h8v8"/></symbol>
   <symbol id="i-out" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M5 9l7 7 7-7"/></symbol>
   <symbol id="i-img" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="10" r="1.6" fill="currentColor"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="m4 17 5-5 4 4 3-3 4 4"/></symbol>
 </svg>
 
@@ -183,19 +220,35 @@
     <div class="wrap top-inner">
       <span class="logo"><svg><use href="#logo"/></svg><span><span class="logo-word">12<span>/</span>VOLTEC</span><small>Panel administrativo</small></span></span>
       <div class="top-actions">
-        <a class="btn btn-sm" href="/#taller" target="_blank" rel="noopener"><svg><use href="#i-ext"/></svg><span>Ver sitio</span></a>
+        <a class="btn btn-sm" href="/" target="_blank" rel="noopener"><svg><use href="#i-ext"/></svg><span>Ver sitio</span></a>
         <button class="btn btn-sm" id="logout" type="button" aria-label="Cerrar sesión"><svg><use href="#i-out"/></svg><span>Salir</span></button>
       </div>
     </div>
   </header>
 
   <main class="wrap">
-    <div class="intro">
-      <h1>Hecho en nuestro taller</h1>
-      <p>Estos son los 4 trabajos que se ven en la página. Cambia la portada de cada uno y agrega las fotos relacionadas: cuando un visitante toque la portada, verá todas sus fotos.</p>
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" data-tab="taller" aria-selected="true">Hecho en nuestro taller</button>
+      <button type="button" role="tab" data-tab="clientes" aria-selected="false">Clientes satisfechos</button>
     </div>
     <div class="loading-page" id="loadingJobs">Cargando…</div>
-    <div class="jobs" id="jobs"></div>
+
+    <section id="tab-taller">
+      <div class="intro">
+        <h1>Hecho en nuestro taller</h1>
+        <p>Estos son los 4 trabajos que se ven en la página. Cambia la portada de cada uno y agrega las fotos relacionadas: cuando un visitante toque la portada, verá todas sus fotos.</p>
+      </div>
+      <div class="jobs" id="jobs"></div>
+    </section>
+
+    <section id="tab-clientes" hidden>
+      <div class="intro">
+        <h1>Clientes satisfechos</h1>
+        <p>Aparecen en la sección "Antes y después" con el botón "Clientes satisfechos". Por cada cliente sube el vehículo, una breve descripción del trabajo y las fotos de antes y después. El botón se muestra en la página cuando hay al menos un cliente.</p>
+      </div>
+      <div class="clients" id="clients"></div>
+      <button type="button" class="add-client" id="addClient"><svg><use href="#i-plus"/></svg>Agregar cliente</button>
+    </section>
   </main>
 
   <div class="savebar" id="savebar">
@@ -269,6 +322,7 @@ async function showApp() {
     savedJSON = JSON.stringify(gallery);
     $('#loadingJobs').hidden = true;
     render();
+    showTab(location.hash === '#clientes' ? 'clientes' : 'taller');
   } catch (e) {
     $('#loadingJobs').textContent = 'No se pudo cargar la galería. Recarga la página.';
   }
@@ -301,7 +355,96 @@ function updateSavebar() {
   $('#saveMsg').textContent = uploading > 0 ? `Subiendo ${uploading} foto${uploading > 1 ? 's' : ''}…` : 'Tienes cambios sin guardar.';
 }
 
+// ---- tabs ----
+function showTab(name) {
+  document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === name));
+  $('#tab-taller').hidden = name !== 'taller';
+  $('#tab-clientes').hidden = name !== 'clientes';
+  history.replaceState(null, '', name === 'clientes' ? '#clientes' : location.pathname);
+}
+document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+
+// ---- satisfied customers ----
+const slot = (c, i, kind, label) => `
+  <div>
+    <div class="slot-label">${label}</div>
+    <label class="slot${c[kind] ? ' has' : ''}${c['_up_' + kind] ? ' loading' : ''}" tabindex="0">
+      ${c[kind] ? `<img src="${esc(c[kind])}" alt=""><span class="chg">Cambiar</span>` : `<span>${icon('i-plus')}Foto de ${label.toLowerCase()}</span>`}
+      <input class="file" type="file" accept="image/*" data-kind="${kind}">
+    </label>
+  </div>`;
+
+function renderClients() {
+  const list = gallery.clients;
+  $('#clients').innerHTML = list.length ? list.map((c, i) => `
+    <article class="client" data-c="${i}">
+      <div class="client-head">
+        <h2>Cliente ${i + 1}</h2>
+        <div class="client-tools">
+          <button type="button" class="icon-btn" data-cact="up" aria-label="Subir" ${i === 0 ? 'disabled' : ''}>${icon('i-up')}</button>
+          <button type="button" class="icon-btn" data-cact="down" aria-label="Bajar" ${i === list.length - 1 ? 'disabled' : ''}>${icon('i-down')}</button>
+          <button type="button" class="icon-btn del" data-cact="del" aria-label="Eliminar cliente">${icon('i-x')}</button>
+        </div>
+      </div>
+      <div class="client-grid">
+        <div class="client-text">
+          <div class="field">
+            <label for="cv${i}">Vehículo</label>
+            <input class="input" id="cv${i}" data-cf="vehicle" maxlength="80" placeholder="Ej. 2019 Toyota 4Runner" value="${esc(c.vehicle || '')}">
+          </div>
+          <div class="field">
+            <label for="cw${i}">Trabajo realizado</label>
+            <textarea class="input" id="cw${i}" data-cf="work" maxlength="600" placeholder="Ej. Instalamos pantalla Kenwood de 10&quot; con Apple CarPlay, cámara de reversa y bocinas JBL.">${esc(c.work || '')}</textarea>
+          </div>
+        </div>
+        ${slot(c, i, 'before', 'Antes')}
+        ${slot(c, i, 'after', 'Después')}
+      </div>
+    </article>`).join('') : '<div class="empty">Todavía no hay clientes. Agrega el primero con el botón de abajo.</div>';
+}
+
+$('#addClient').addEventListener('click', () => {
+  gallery.clients.push({ vehicle: '', work: '', before: '', after: '' });
+  render();
+  const last = document.querySelector('.client:last-child');
+  last.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  last.querySelector('input').focus({ preventScroll: true });
+});
+$('#clients').addEventListener('input', e => {
+  const f = e.target.dataset.cf; if (!f) return;
+  gallery.clients[+e.target.closest('.client').dataset.c][f] = e.target.value;
+  e.target.closest('.client').classList.remove('missing');
+  updateSavebar();
+});
+$('#clients').addEventListener('click', e => {
+  const b = e.target.closest('[data-cact]'); if (!b) return;
+  const list = gallery.clients, i = +b.closest('.client').dataset.c;
+  if (b.dataset.cact === 'del') { if (!confirm(`¿Eliminar al cliente ${i + 1}?`)) return; list.splice(i, 1); }
+  if (b.dataset.cact === 'up' && i > 0) [list[i - 1], list[i]] = [list[i], list[i - 1]];
+  if (b.dataset.cact === 'down' && i < list.length - 1) [list[i + 1], list[i]] = [list[i], list[i + 1]];
+  render();
+});
+$('#clients').addEventListener('change', async e => {
+  const kind = e.target.dataset.kind; if (!kind) return;
+  const file = e.target.files[0]; if (!file) return;
+  const c = gallery.clients[+e.target.closest('.client').dataset.c];
+  e.target.value = '';
+  c['_up_' + kind] = true; uploading++; render();
+  try { c[kind] = await upload(file); }
+  catch (err) { toast(err.message, 'bad'); }
+  delete c['_up_' + kind]; uploading--; render();
+});
+$('#clients').addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('label[tabindex]')) { e.preventDefault(); e.target.querySelector('input').click(); }
+});
+
+// A customer must be complete before saving
+function firstIncomplete() {
+  return gallery.clients.findIndex(c => !c.vehicle.trim() || !c.work.trim() || !c.before || !c.after);
+}
+
 function render() {
+  renderClients();
   $('#jobs').innerHTML = gallery.items.map((it, i) => `
     <section class="job" data-i="${i}">
       <div class="job-cover-col">
@@ -408,6 +551,14 @@ $('#jobs').addEventListener('drop', e => {
 });
 
 $('#save').addEventListener('click', async () => {
+  const bad = firstIncomplete();
+  if (bad !== -1) {
+    showTab('clientes');
+    const card = document.querySelector(`.client[data-c="${bad}"]`);
+    card.classList.add('missing');
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return toast(`Al cliente ${bad + 1} le falta información: vehículo, descripción y las dos fotos.`, 'bad');
+  }
   const btn = $('#save'); btn.disabled = true; btn.textContent = 'Guardando…';
   try {
     const saved = await api('/api/gallery', { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify(gallery) });

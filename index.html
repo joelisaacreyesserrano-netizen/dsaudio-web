@@ -247,6 +247,56 @@
     .ba-cap strong { display: block; font-size: 0.98rem; }
     .ba-cap span { font-size: 0.86rem; color: var(--muted); }
 
+    /* ===== SATISFIED CUSTOMERS ===== */
+    .cs {
+      width: min(1180px, calc(100% - 48px)); max-width: none; max-height: calc(100dvh - 48px); margin: auto; padding: 0;
+      border: 0; border-radius: calc(var(--radius) + 6px); background: var(--bg); color: var(--ink);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.35); overflow: hidden;
+    }
+    .cs::backdrop { background: rgba(12,12,13,0.7); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+    .cs[open] { display: flex; flex-direction: column; }
+    .cs-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 28px; border-bottom: 1px solid var(--line); }
+    .cs-head h3 { font-family: var(--display); font-stretch: 110%; font-weight: 800; font-size: 1.35rem; letter-spacing: -0.01em; }
+    .cs-head .cs-count { display: block; color: var(--muted); font-size: 0.88rem; font-weight: 500; margin-top: 2px; font-variant-numeric: tabular-nums; }
+    .cs-nav { display: flex; gap: 8px; }
+    .cs-btn { width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; display: grid; place-items: center; transition: border-color 0.2s; }
+    .cs-btn:hover { border-color: var(--ink); }
+    .btn[hidden], .cs-btn[hidden] { display: none; }
+    .cs-btn:disabled { opacity: 0.35; cursor: default; border-color: var(--line); }
+    .cs-btn svg { width: 18px; height: 18px; }
+    .cs-body { padding: 24px 28px 28px; overflow-y: auto; }
+    .cs-case { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .cs-desc {
+      background: var(--ink); color: #fff; border-radius: var(--radius); padding: 28px; aspect-ratio: 4 / 5;
+      display: flex; flex-direction: column; justify-content: flex-end; position: relative; overflow: hidden;
+      background-image: radial-gradient(circle at 100% 0%, rgba(242,84,27,0.28) 0, rgba(242,84,27,0) 300px);
+    }
+    .cs-desc .cs-quote { position: absolute; top: 24px; left: 28px; width: 40px; height: 40px; color: var(--accent); }
+    .cs-desc small { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+    .cs-desc h4 { font-family: var(--display); font-stretch: 110%; font-weight: 800; font-size: 1.5rem; line-height: 1.12; margin: 8px 0 12px; }
+    .cs-desc p { color: rgba(255,255,255,0.82); font-size: 0.95rem; line-height: 1.6; white-space: pre-line; }
+    .cs-case .ba-card { aspect-ratio: 4 / 5; }
+    .cs-case .ba-card img { object-position: center; }
+    .cs-dots { display: flex; justify-content: center; gap: 6px; margin-top: 20px; }
+    .cs-dots button { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px; background: #CFCCC4; cursor: pointer; transition: width 0.25s, background 0.25s; }
+    .cs-dots button[aria-current="true"] { width: 24px; background: var(--accent); }
+    @media (max-width: 900px) {
+      .cs-case { grid-template-columns: 1fr 1fr; }
+      .cs-desc { grid-column: 1 / -1; aspect-ratio: auto; min-height: 0; padding-top: 76px; }
+    }
+    @media (max-width: 640px) {
+      .cs { width: 100%; max-height: 94dvh; margin: auto 0 0; border-radius: 22px 22px 0 0; }
+      .cs-head { padding: 16px 20px; }
+      .cs-head h3 { font-size: 1.1rem; }
+      .cs-head .cs-count { font-size: 0.8rem; }
+      .cs-body { padding: 16px 16px calc(20px + env(safe-area-inset-bottom)); }
+      .cs-case { gap: 10px; }
+      .cs-desc { padding: 70px 20px 22px; }
+      .cs-desc .cs-quote { top: 20px; left: 20px; width: 34px; height: 34px; }
+      .cs-desc h4 { font-size: 1.25rem; }
+      .cs-btn { width: 40px; height: 40px; }
+    }
+
     /* ===== PROCESS ===== */
     .process { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
     .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; counter-reset: s; }
@@ -474,6 +524,8 @@
   <symbol id="i-chev-r" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></symbol>
   <symbol id="i-photos" viewBox="0 0 24 24"><rect x="7" y="3.5" width="13.5" height="13.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M16.5 20.5h-10a3 3 0 0 1-3-3v-10"/></symbol>
   <symbol id="i-camera" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.2l1.5-2.2h5.6L16.3 7h2.2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="12.8" r="3.4" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path fill="currentColor" d="m12 3.2 2.6 5.5 6 .7-4.4 4.1 1.2 5.9L12 16.5l-5.4 2.9 1.2-5.9-4.4-4.1 6-.7z"/></symbol>
+  <symbol id="i-quote" viewBox="0 0 24 24"><path fill="currentColor" d="M10 7H6a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2v1a2 2 0 0 1-2 2H5v2h1a4 4 0 0 0 4-4zm10 0h-4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2v1a2 2 0 0 1-2 2h-1v2h1a4 4 0 0 0 4-4z"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4 8h16M4 16h16"/></symbol>
   <symbol id="logo" viewBox="0 0 40 40"><rect width="40" height="40" rx="11" fill="#111214"/><text x="6" y="27" font-family="Archivo, sans-serif" font-weight="800" font-size="17" fill="#fff" letter-spacing="-0.5">12</text><path d="M30 7 23.5 21h4.5l-2 12 8-15.5h-4.8z" fill="#F2541B"/></symbol>
 </svg>
@@ -632,6 +684,7 @@
           <h2 class="display" data-i18n="ba.title">Before &amp; after</h2>
           <p class="lead" data-i18n="ba.lead">Same dash, completely different drive.</p>
         </div>
+        <button type="button" class="btn btn-dark" id="csOpen" hidden><svg><use href="#i-star"/></svg><span data-i18n="cs.btn">Happy customers</span></button>
       </div>
       <div class="ba rv">
         <figure class="ba-card">
@@ -762,6 +815,18 @@
   <option>Acura</option><option>Audi</option><option>BMW</option><option>Buick</option><option>Cadillac</option><option>Chevrolet</option><option>Chrysler</option><option>Dodge</option><option>Fiat</option><option>Ford</option><option>Genesis</option><option>GMC</option><option>Honda</option><option>Hyundai</option><option>Infiniti</option><option>Jeep</option><option>Kia</option><option>Land Rover</option><option>Lexus</option><option>Lincoln</option><option>Mazda</option><option>Mercedes-Benz</option><option>Mini</option><option>Mitsubishi</option><option>Nissan</option><option>Polaris</option><option>Ram</option><option>Subaru</option><option>Tesla</option><option>Toyota</option><option>Volkswagen</option><option>Volvo</option>
 </datalist>
 
+<dialog class="cs" id="clients" aria-labelledby="csTitle">
+  <div class="cs-head">
+    <div><h3 id="csTitle" data-i18n="cs.title">Happy customers</h3><span class="cs-count" id="csCount"></span></div>
+    <div class="cs-nav">
+      <button type="button" class="cs-btn" id="csPrev" aria-label="Previous"><svg><use href="#i-chev-l"/></svg></button>
+      <button type="button" class="cs-btn" id="csNext" aria-label="Next"><svg><use href="#i-chev-r"/></svg></button>
+      <button type="button" class="cs-btn" id="csClose" aria-label="Close"><svg><use href="#i-x"/></svg></button>
+    </div>
+  </div>
+  <div class="cs-body" id="csBody"></div>
+</dialog>
+
 <dialog class="lb" id="lightbox" aria-label="Photos">
   <div class="lb-top">
     <div><span class="lb-title" id="lbTitle"></span><span class="lb-count" id="lbCount"></span></div>
@@ -810,6 +875,7 @@ const ES = {
   'offer.book': 'Agenda un diagnóstico',
   'ba.eyebrow': 'La diferencia', 'ba.title': 'Antes y después', 'ba.lead': 'El mismo tablero, una experiencia totalmente distinta.',
   'ba.before': 'Antes', 'ba.after': 'Después',
+  'cs.btn': 'Clientes satisfechos', 'cs.title': 'Clientes satisfechos',
   'ba.b.h': 'Equipo de fábrica', 'ba.b.p': 'Pantalla pequeña, funciones limitadas.',
   'ba.a.h': 'Mejora 12 Voltec', 'ba.a.p': 'Pantalla Kenwood con Apple CarPlay.',
   'p.eyebrow': 'Cómo funciona', 'p.title': 'Tu proyecto en tres pasos',
@@ -871,6 +937,69 @@ document.querySelectorAll('.rv').forEach(el => io.observe(el));
 })();
 
 document.getElementById('year').textContent = new Date().getFullYear();
+
+// Content managed from /panel (shop gallery + satisfied customers)
+const siteContent = fetch('/api/gallery').then(r => r.ok ? r.json() : null).catch(() => null);
+
+// ---- Satisfied customers: description + before + after, one customer at a time ----
+(function () {
+  const btn = document.getElementById('csOpen');
+  const dlg = document.getElementById('clients');
+  const body = document.getElementById('csBody');
+  const $ = id => document.getElementById(id);
+  let clients = [], idx = 0;
+  const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const L = () => document.documentElement.lang === 'es'
+    ? { of: (a, b) => `Cliente ${a} de ${b}`, work: 'Trabajo realizado', before: 'Antes', after: 'Después' }
+    : { of: (a, b) => `Customer ${a} of ${b}`, work: 'The job', before: 'Before', after: 'After' };
+
+  siteContent.then(d => {
+    clients = (d && Array.isArray(d.clients)) ? d.clients : [];
+    btn.hidden = !clients.length;
+  });
+
+  function show(i) {
+    idx = Math.max(0, Math.min(clients.length - 1, i));
+    const c = clients[idx], t = L();
+    body.innerHTML = `
+      <div class="cs-case">
+        <div class="cs-desc">
+          <svg class="cs-quote"><use href="#i-quote"/></svg>
+          <small>${t.work}</small>
+          <h4>${esc(c.vehicle)}</h4>
+          <p>${esc(c.work)}</p>
+        </div>
+        <figure class="ba-card"><img src="${esc(c.before)}" alt="${esc(c.vehicle)} — ${t.before}"><span class="ba-tag">${t.before}</span></figure>
+        <figure class="ba-card after"><img src="${esc(c.after)}" alt="${esc(c.vehicle)} — ${t.after}"><span class="ba-tag">${t.after}</span></figure>
+      </div>
+      ${clients.length > 1 ? `<div class="cs-dots">${clients.map((_, j) => `<button type="button" data-j="${j}" aria-label="${j + 1}" aria-current="${j === idx}"></button>`).join('')}</div>` : ''}`;
+    $('csCount').textContent = clients.length > 1 ? t.of(idx + 1, clients.length) : '';
+    $('csPrev').hidden = $('csNext').hidden = clients.length < 2;
+    $('csPrev').disabled = idx === 0;
+    $('csNext').disabled = idx === clients.length - 1;
+    body.scrollTop = 0;
+    const n = clients[idx + 1]; if (n) { new Image().src = n.before; new Image().src = n.after; }
+  }
+
+  btn.addEventListener('click', () => { dlg.showModal(); document.body.style.overflow = 'hidden'; show(0); });
+  dlg.addEventListener('close', () => { document.body.style.overflow = ''; });
+  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+  $('csClose').addEventListener('click', () => dlg.close());
+  $('csPrev').addEventListener('click', () => show(idx - 1));
+  $('csNext').addEventListener('click', () => show(idx + 1));
+  body.addEventListener('click', e => { const d = e.target.closest('[data-j]'); if (d) show(+d.dataset.j); });
+  dlg.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') show(idx - 1);
+    if (e.key === 'ArrowRight') show(idx + 1);
+  });
+  let x0 = null;
+  body.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
+  body.addEventListener('touchend', e => {
+    if (x0 === null) return;
+    const dx = e.changedTouches[0].clientX - x0; x0 = null;
+    if (Math.abs(dx) > 50) show(idx + (dx < 0 ? 1 : -1));
+  });
+})();
 
 // ---- Quote form: 5 quick questions, then a ready-to-send WhatsApp message ----
 (function () {
@@ -1067,9 +1196,9 @@ document.getElementById('year').textContent = new Date().getFullYear();
   // Re-label the count when the language toggle is used
   document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', paintCards));
 
-  fetch('/api/gallery').then(r => r.ok ? r.json() : null).then(d => {
+  siteContent.then(d => {
     if (d && Array.isArray(d.items) && d.items.length === cards.length) { items = d.items; paintCards(); }
-  }).catch(() => {});
+  });
 
   function show(i) {
     idx = (i + list.length) % list.length;

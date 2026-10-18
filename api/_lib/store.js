@@ -12,6 +12,8 @@ export const DEFAULT_GALLERY = {
     { cover: 'img/work-3.jpg', title: '', alt: 'Shelby Mustang with an Apple CarPlay touchscreen radio', photos: [] },
     { cover: 'img/work-4.jpg', title: '', alt: 'Audio processor mounted inside a vehicle panel', photos: [] },
   ],
+  // "Satisfied customers" cases shown from the Before & after section
+  clients: [],
 };
 
 async function listAll(prefix) {
@@ -32,7 +34,8 @@ export async function readGallery() {
   files.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
   const res = await fetch(files[0].url);
   if (!res.ok) throw new Error('No se pudo leer la galería');
-  return res.json();
+  const data = await res.json();
+  return { ...data, clients: data.clients || [] };
 }
 
 export async function writeGallery(gallery) {
@@ -48,7 +51,10 @@ export async function writeGallery(gallery) {
 
 // Delete uploaded photos no longer referenced; recent ones may belong to an unsaved edit
 async function removeUnusedPhotos(gallery) {
-  const used = new Set(gallery.items.flatMap(i => [i.cover, ...i.photos]));
+  const used = new Set([
+    ...gallery.items.flatMap(i => [i.cover, ...i.photos]),
+    ...gallery.clients.flatMap(c => [c.before, c.after]),
+  ]);
   const cutoff = Date.now() - 60 * 60 * 1000;
   const stale = (await listAll(PHOTO_PREFIX))
     .filter(b => !used.has(b.url) && new Date(b.uploadedAt).getTime() < cutoff);

@@ -2,6 +2,7 @@ import { isAuthed, json } from './_lib/auth.js';
 import { readGallery, writeGallery, isOwnPhoto, DEFAULT_GALLERY } from './_lib/store.js';
 
 const MAX_PHOTOS = 40;
+const MAX_CLIENTS = 30;
 
 export async function GET(request) {
   try {
@@ -39,8 +40,19 @@ export async function PUT(request) {
       photos,
     });
   }
+  const rawClients = Array.isArray(body.clients) ? body.clients : [];
+  if (rawClients.length > MAX_CLIENTS) return json({ error: `Máximo ${MAX_CLIENTS} clientes` }, 400);
+  const clients = [];
+  for (const [i, raw] of rawClients.entries()) {
+    const c = raw && typeof raw === 'object' ? raw : {};
+    const vehicle = text(c.vehicle, 80), work = text(c.work, 600);
+    if (!vehicle || !work) return json({ error: `Al cliente ${i + 1} le falta el vehículo o la descripción` }, 400);
+    if (!isOwnPhoto(c.before) || !isOwnPhoto(c.after)) return json({ error: `Al cliente ${i + 1} le falta la foto de antes o de después` }, 400);
+    clients.push({ vehicle, work, before: c.before, after: c.after });
+  }
+
   try {
-    return json(await writeGallery({ items }));
+    return json(await writeGallery({ items, clients }));
   } catch (e) {
     console.error(e);
     return json({ error: 'No se pudo guardar. Intenta de nuevo.' }, 500);
