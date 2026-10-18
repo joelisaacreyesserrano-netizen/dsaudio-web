@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
   <title>Panel 12 Voltec</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111214'/%3E%3Cpath d='M18 4 9 18h6l-2 10 10-15h-6z' fill='%23F2541B'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" href="/img/logo-mark.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -25,9 +25,9 @@
 
     .logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
     .logo svg { width: 36px; height: 36px; }
-    .logo-word { font-family: var(--display); font-stretch: 125%; font-weight: 800; font-size: 1.05rem; letter-spacing: 0.02em; line-height: 1; }
-    .logo-word span { color: var(--accent); }
-    .logo small { display: block; font-family: var(--body); font-weight: 500; font-size: 0.75rem; color: var(--muted); letter-spacing: 0; margin-top: 3px; }
+    .logo-img { display: block; height: 34px; width: auto; }
+    .login-logo { height: 44px; }
+    .logo small { display: block; font-family: var(--body); font-weight: 500; font-size: 0.75rem; color: var(--muted); padding-left: 12px; border-left: 1px solid var(--line); line-height: 1.3; }
 
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -295,7 +295,6 @@
 <body>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="logo" viewBox="0 0 40 40"><rect width="40" height="40" rx="11" fill="#111214"/><text x="6" y="27" font-family="Archivo, sans-serif" font-weight="800" font-size="17" fill="#fff" letter-spacing="-0.5">12</text><path d="M30 7 23.5 21h4.5l-2 12 8-15.5h-4.8z" fill="#F2541B"/></symbol>
   <symbol id="i-left" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M15 5l-7 7 7 7"/></symbol>
   <symbol id="i-right" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></symbol>
@@ -310,9 +309,9 @@
 <!-- LOGIN -->
 <main id="login" class="login" hidden>
   <form class="login-card" id="loginForm" autocomplete="on">
-    <span class="logo"><svg><use href="#logo"/></svg><span class="logo-word">12<span>/</span>VOLTEC</span></span>
+    <img class="logo-img login-logo" src="/img/logo.png" alt="12 Voltec" width="210" height="44">
     <h1>Panel administrativo</h1>
-    <p>Inicia sesión para editar los trabajos de "Hecho en nuestro taller".</p>
+    <p>Inicia sesión para ver las cotizaciones y editar el contenido del sitio.</p>
     <div class="field">
       <label for="user">Usuario</label>
       <input class="input" id="user" name="username" autocomplete="username" autocapitalize="off" spellcheck="false" required>
@@ -330,7 +329,7 @@
 <div id="app" hidden>
   <header class="top">
     <div class="wrap top-inner">
-      <span class="logo"><svg><use href="#logo"/></svg><span><span class="logo-word">12<span>/</span>VOLTEC</span><small>Panel administrativo</small></span></span>
+      <span class="logo"><img class="logo-img" src="/img/logo.png" alt="12 Voltec" width="160" height="34"><small>Panel administrativo</small></span>
       <div class="top-actions">
         <a class="btn btn-sm" href="/" target="_blank" rel="noopener"><svg><use href="#i-ext"/></svg><span>Ver sitio</span></a>
         <button class="btn btn-sm" id="logout" type="button" aria-label="Cerrar sesión"><svg><use href="#i-out"/></svg><span>Salir</span></button>
@@ -1140,6 +1139,15 @@ function loadJsPdf() {
   });
 }
 
+function loadPng(url) {
+  return fetch(url).then(r => { if (!r.ok) throw new Error('No se pudo cargar el logo'); return r.blob(); })
+    .then(b => new Promise((res, rej) => {
+      const fr = new FileReader();
+      fr.onload = () => { const im = new Image(); im.onload = () => res({ data: fr.result, w: im.naturalWidth, h: im.naturalHeight }); im.onerror = rej; im.src = fr.result; };
+      fr.onerror = rej; fr.readAsDataURL(b);
+    }));
+}
+
 async function downloadEstimatePdf(q, st) {
   await loadJsPdf();
   const { jsPDF } = window.jspdf;
@@ -1156,24 +1164,11 @@ async function downloadEstimatePdf(q, st) {
   const ORANGE = [242, 84, 27], ORANGE_INK = [184, 58, 12];
   const t = totals(e);
 
-  // 12 Voltec logo: the dark "12" tile with the orange bolt, then the 12/VOLTEC wordmark
-  function logo(cx, cy, wordColor, slashColor, tile, tileColor = INK, numColor = WHITE) {
-    font('bold', tile * 0.62, wordColor);
-    const parts = ['12', '/', 'VOLTEC'], gap = tile * 0.28, cs = tile * 0.03;
-    const widths = parts.map(p => doc.getTextWidth(p) + cs * (p.length - 1));
-    const total = tile + gap + widths.reduce((a, b) => a + b, 0);
-    const x0 = cx - total / 2, y0 = cy - tile / 2, u = tile / 40;
-    doc.setFillColor(...tileColor); doc.roundedRect(x0, y0, tile, tile, 11 * u, 11 * u, 'F');
-    font('bold', 17 * u, numColor); doc.text('12', x0 + 6 * u, y0 + 27 * u);
-    doc.setFillColor(...ORANGE);
-    const bolt = [[30, 7], [23.5, 21], [28, 21], [26, 33], [34, 17.5], [29.2, 17.5]];
-    doc.lines(bolt.slice(1).map((p, i) => [(p[0] - bolt[i][0]) * u, (p[1] - bolt[i][1]) * u]), x0 + bolt[0][0] * u, y0 + bolt[0][1] * u, [1, 1], 'F', true);
-    let x = x0 + tile + gap;
-    parts.forEach((p, i) => {
-      font('bold', tile * 0.62, i === 1 ? slashColor : wordColor);
-      doc.text(p, x, cy + tile * 0.22, { charSpace: cs });
-      x += widths[i];
-    });
+  // The 12 Voltec logo files (light version for the cream page, dark version for the black header)
+  const [logoDark, logoLight] = await Promise.all([loadPng('/img/logo-pdf-dark.png'), loadPng('/img/logo-pdf-light.png')]);
+  function logo(img, cx, cy, h) {
+    const w = h * img.w / img.h;
+    doc.addImage(img.data, 'PNG', cx - w / 2, cy - h / 2, w, h, img.data.length + '', 'FAST');
   }
 
   // Little red glyphs inside the white circles of the contact block
@@ -1200,7 +1195,7 @@ async function downloadEstimatePdf(q, st) {
   poly([[0, 0], [270, 0], [330, 125], [0, 125]], INK2);
   poly([[105, 0], [160, 0], [215, 155], [158, 155]], ORANGE);
   poly([[345, 0], [924, 0], [924, 205], [450, 205]], INK);
-  logo(X(730), X(100), WHITE, ORANGE, X(56), WHITE, INK);
+  logo(logoDark, X(705), X(100), X(62));
 
   // Site-style eyebrow bar + heading
   doc.setFillColor(...ORANGE); doc.rect(X(103), X(228), X(28), X(4), 'F');
@@ -1272,7 +1267,7 @@ async function downloadEstimatePdf(q, st) {
     poly([[0, 0], [285, 0], [285, 57], [0, 57]], INK2);
     poly([[143, 0], [192, 0], [210, 80], [165, 80]], ORANGE);
     poly([[340, 0], [924, 0], [924, 103], [372, 103]], INK);
-    logo(W / 2, X(205), INK, ORANGE, X(60));
+    logo(logoLight, W / 2, X(205), X(66));
     font('bold', 29, INK); txt('SERVICE WARRANTY', 462, 337, { align: 'center', charSpace: 1 });
     doc.setFillColor(...ORANGE); doc.rect(X(462 - 20), X(354), X(40), X(4), 'F');
     font('normal', 12.5, INK);

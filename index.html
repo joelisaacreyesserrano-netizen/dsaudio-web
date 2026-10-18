@@ -12,7 +12,8 @@
   <meta property="og:description" content="Clean, custom installs for your vehicle. Diagnostic included with every install.">
   <meta property="og:url" content="https://12voltec.com/">
   <meta property="og:image" content="https://12voltec.com/img/4runner-front.jpg">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111214'/%3E%3Cpath d='M18 4 9 18h6l-2 10 10-15h-6z' fill='%23F2541B'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" href="img/logo-mark.png">
+  <link rel="apple-touch-icon" href="img/logo-mark.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -95,9 +96,7 @@
     .header-inner { height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 
     .logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
-    .logo-mark { width: 38px; height: 38px; flex-shrink: 0; }
-    .logo-word { font-family: var(--display); font-stretch: 125%; font-weight: 800; font-size: 1.15rem; letter-spacing: 0.02em; line-height: 1; }
-    .logo-word span { color: var(--accent); }
+    .logo-img { display: block; height: 36px; width: auto; }
 
     .nav { display: flex; align-items: center; gap: 32px; list-style: none; }
     .nav a { text-decoration: none; font-size: 0.92rem; font-weight: 500; color: var(--ink-2); transition: color 0.2s; }
@@ -558,7 +557,7 @@
       .lb-thumbs button { width: 52px; height: 52px; }
       .lb-stage img { max-height: calc(100dvh - 170px); }
       .contact { grid-template-columns: 1fr; }
-      .logo-word { font-size: 1rem; }
+      .logo-img { height: 30px; }
       .footer-inner { flex-direction: column; align-items: flex-start; }
     }
   </style>
@@ -585,14 +584,12 @@
   <symbol id="i-star" viewBox="0 0 24 24"><path fill="currentColor" d="m12 3.2 2.6 5.5 6 .7-4.4 4.1 1.2 5.9L12 16.5l-5.4 2.9 1.2-5.9-4.4-4.1 6-.7z"/></symbol>
   <symbol id="i-quote" viewBox="0 0 24 24"><path fill="currentColor" d="M10 7H6a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2v1a2 2 0 0 1-2 2H5v2h1a4 4 0 0 0 4-4zm10 0h-4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2v1a2 2 0 0 1-2 2h-1v2h1a4 4 0 0 0 4-4z"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4 8h16M4 16h16"/></symbol>
-  <symbol id="logo" viewBox="0 0 40 40"><rect width="40" height="40" rx="11" fill="#111214"/><text x="6" y="27" font-family="Archivo, sans-serif" font-weight="800" font-size="17" fill="#fff" letter-spacing="-0.5">12</text><path d="M30 7 23.5 21h4.5l-2 12 8-15.5h-4.8z" fill="#F2541B"/></symbol>
 </svg>
 
 <header id="header">
   <div class="wrap header-inner">
     <a href="#top" class="logo" aria-label="12 Voltec home">
-      <svg class="logo-mark"><use href="#logo"/></svg>
-      <span class="logo-word">12<span>/</span>VOLTEC</span>
+      <img class="logo-img" src="img/logo.png" alt="12 Voltec" width="265" height="56">
     </a>
     <ul class="nav">
       <li><a href="#services" data-i18n="nav.services">Services</a></li>
@@ -836,8 +833,7 @@
 <footer>
   <div class="wrap footer-inner">
     <a href="#top" class="logo" aria-label="12 Voltec">
-      <svg class="logo-mark"><use href="#logo"/></svg>
-      <span class="logo-word">12<span>/</span>VOLTEC</span>
+      <img class="logo-img" src="img/logo.png" alt="12 Voltec" width="265" height="56">
     </a>
     <ul class="footer-links">
       <li><a href="#services" data-i18n="nav.services">Services</a></li>
