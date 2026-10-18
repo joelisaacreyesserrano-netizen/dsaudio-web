@@ -5,11 +5,46 @@ export const PREFIX = process.env.VERCEL_ENV === 'production' ? 'taller/' : 'tal
 const DATA_PREFIX = PREFIX + 'data-';
 export const PHOTO_PREFIX = PREFIX + 'fotos/';
 
-// Service ids, in the order the cards appear in "Our services"
-export const SERVICE_IDS = [
-  'radios', 'amplificadores', 'amplificadores-sub', 'bocinas', 'aislamiento',
-  'camaras-reversa', 'camaras-tablero', 'radar', 'iluminacion',
+// The original "Our services" cards; the panel can edit, reorder, add and remove them
+const svc = (id, cover, pos, es, en, descEs, descEn, alt) =>
+  ({ id, cover, pos, alt, title: { es, en }, desc: { es: descEs, en: descEn }, examples: [] });
+export const DEFAULT_SERVICES = [
+  svc('radios', 'img/screen.jpg', 'center 45%', 'Radios', 'Radios',
+    'Pantallas táctiles con Apple CarPlay, Android Auto y Bluetooth.', 'Touchscreens with Apple CarPlay, Android Auto and Bluetooth.',
+    'Apple CarPlay touchscreen radio installed in a Ford Mustang dash'),
+  svc('amplificadores', 'img/amplifier.jpg', 'center 70%', 'Amplificadores de 4 y 5 canales', '4 & 5 Channel Amplifiers',
+    'Potencia limpia para todo tu sistema, instalada y calibrada.', 'Clean power for your whole system, installed and tuned.',
+    'Two amplifiers installed in a vehicle'),
+  svc('amplificadores-sub', 'img/sub-amp.jpg', 'center 62%', 'Amplificadores para sub', 'Sub Amplifiers',
+    'Potencia dedicada para que el bajo pegue limpio y fuerte.', 'Dedicated power so your bass hits clean and hard.',
+    'Dual subwoofer box installed in an SUV cargo area'),
+  svc('bocinas', 'img/speakers-door.jpg', 'center 60%', 'Bocinas', 'Speakers',
+    'Componentes y coaxiales con claridad real.', 'Component and coaxial upgrades with real clarity.',
+    'Upgraded door speaker installed in a Ford Bronco'),
+  svc('aislamiento', 'img/sound-damping.jpg', 'center 55%', 'Aislamiento acústico', 'Sound Damping',
+    'Menos ruido del camino y vibraciones, mejor sonido adentro.', 'Less road noise and rattles, better sound inside.',
+    'Car door interior panel'),
+  svc('camaras-reversa', 'img/backup-camera.jpg', 'center 55%', 'Cámaras de reversa', 'Backup Cameras',
+    'La vista trasera directo en la pantalla de tu radio.', 'Your rear view, right on your radio screen.',
+    'Backup camera view shown on an aftermarket radio screen in a Mustang'),
+  svc('camaras-tablero', 'img/dash-cam.jpg', 'center 55%', 'Cámaras de tablero', 'Dash Cams',
+    'Delantera y trasera, conectadas con cableado oculto.', 'Front and rear, hardwired with hidden routing.',
+    'Dash cam installed on a windshield'),
+  svc('radar', 'img/radar-detector.jpg', 'center 35%', 'Radar', 'Radar',
+    'Conectados directo y siempre encendidos, sin cables colgando.', 'Hardwired and always on — no cords hanging.',
+    'Radar detector mounted on a windshield at night'),
+  svc('iluminacion', 'img/lighting.jpg', 'center 60%', 'Iluminación', 'Lighting',
+    'Luces ambientales interiores, bajo el auto y en llantas.', 'Ambient interior, underglow and wheel-well lights.',
+    'Car interior with red ambient lighting'),
 ];
+export const DEFAULT_COVERS = new Set(DEFAULT_SERVICES.map(s => s.cover));
+
+// Older saves kept only example photos, keyed by service id
+function migrateServices(services) {
+  if (Array.isArray(services)) return services;
+  const examples = services || {};
+  return DEFAULT_SERVICES.map(s => ({ ...s, examples: examples[s.id] || [] }));
+}
 
 export const DEFAULT_GALLERY = {
   items: [
@@ -20,8 +55,8 @@ export const DEFAULT_GALLERY = {
   ],
   // "Satisfied customers" cases shown from the Before & after section
   clients: [],
-  // Example photos per service: { radios: [{ url, caption }], ... }
-  services: {},
+  // "Our services" cards, each with its own examples page
+  services: DEFAULT_SERVICES,
 };
 
 async function listAll(prefix) {
@@ -43,7 +78,7 @@ export async function readGallery() {
   const res = await fetch(files[0].url);
   if (!res.ok) throw new Error('No se pudo leer la galería');
   const data = await res.json();
-  return { ...data, clients: data.clients || [], services: data.services || {} };
+  return { ...data, clients: data.clients || [], services: migrateServices(data.services) };
 }
 
 export async function writeGallery(gallery) {
@@ -62,7 +97,7 @@ async function removeUnusedPhotos(gallery) {
   const used = new Set([
     ...gallery.items.flatMap(i => [i.cover, ...i.photos]),
     ...gallery.clients.flatMap(c => [c.before, c.after]),
-    ...Object.values(gallery.services).flat().map(e => e.url),
+    ...gallery.services.flatMap(s => [s.cover, ...s.examples.map(e => e.url)]),
   ]);
   const cutoff = Date.now() - 60 * 60 * 1000;
   const stale = (await listAll(PHOTO_PREFIX))

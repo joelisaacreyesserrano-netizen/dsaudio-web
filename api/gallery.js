@@ -1,9 +1,10 @@
 import { isAuthed, json } from './_lib/auth.js';
-import { readGallery, writeGallery, isOwnPhoto, DEFAULT_GALLERY, SERVICE_IDS } from './_lib/store.js';
+import { readGallery, writeGallery, isOwnPhoto, DEFAULT_GALLERY, DEFAULT_SERVICES, DEFAULT_COVERS } from './_lib/store.js';
 
 const MAX_PHOTOS = 40;
 const MAX_CLIENTS = 30;
 const MAX_EXAMPLES = 60;
+const MAX_SERVICES = 24;
 
 export async function GET(request) {
   try {
@@ -52,13 +53,30 @@ export async function PUT(request) {
     clients.push({ vehicle, work, before: c.before, after: c.after });
   }
 
-  const rawServices = body.services && typeof body.services === 'object' ? body.services : {};
-  const services = {};
-  for (const id of SERVICE_IDS) {
-    const list = Array.isArray(rawServices[id]) ? rawServices[id] : [];
-    if (list.length > MAX_EXAMPLES) return json({ error: `Máximo ${MAX_EXAMPLES} ejemplos por servicio` }, 400);
-    if (!list.every(e => e && isOwnPhoto(e.url))) return json({ error: 'Hay una foto inválida en los servicios' }, 400);
-    if (list.length) services[id] = list.map(e => ({ url: e.url, caption: text(e.caption, 100) }));
+  const rawServices = Array.isArray(body.services) ? body.services : [];
+  if (rawServices.length > MAX_SERVICES) return json({ error: `Máximo ${MAX_SERVICES} servicios` }, 400);
+  const services = [], ids = new Set();
+  for (const [i, raw] of rawServices.entries()) {
+    const sv = raw && typeof raw === 'object' ? raw : {};
+    const n = i + 1;
+    const id = String(sv.id || '');
+    if (!/^[a-z0-9-]{1,60}$/.test(id) || ids.has(id)) return json({ error: `El servicio ${n} tiene un identificador inválido` }, 400);
+    ids.add(id);
+    const title = { es: text(sv.title?.es, 60), en: text(sv.title?.en, 60) };
+    if (!title.es) return json({ error: `Al servicio ${n} le falta el título` }, 400);
+    if (!DEFAULT_COVERS.has(sv.cover) && !isOwnPhoto(sv.cover)) return json({ error: `Al servicio ${n} le falta la portada` }, 400);
+    const examples = Array.isArray(sv.examples) ? sv.examples : [];
+    if (examples.length > MAX_EXAMPLES) return json({ error: `Máximo ${MAX_EXAMPLES} ejemplos por servicio` }, 400);
+    if (!examples.every(e => e && isOwnPhoto(e.url))) return json({ error: `Hay una foto inválida en el servicio ${n}` }, 400);
+    const original = DEFAULT_SERVICES.find(d => d.cover === sv.cover);
+    services.push({
+      id, cover: sv.cover, title,
+      desc: { es: text(sv.desc?.es, 200), en: text(sv.desc?.en, 200) },
+      // Framing and alt text only apply to the original photos
+      pos: original ? original.pos : '',
+      alt: original ? original.alt : '',
+      examples: examples.map(e => ({ url: e.url, caption: text(e.caption, 100) })),
+    });
   }
 
   try {

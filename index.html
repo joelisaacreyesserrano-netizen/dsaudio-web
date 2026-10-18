@@ -522,7 +522,7 @@
       .menu-btn { display: inline-flex; }
       .hero-top { grid-template-columns: 1fr; gap: 24px; }
       .cat-grid { grid-template-columns: repeat(2, 1fr); }
-      .cat:last-child { grid-column: 1 / -1; aspect-ratio: 16 / 7; }
+      .cat:last-child:nth-child(odd) { grid-column: 1 / -1; aspect-ratio: 16 / 7; }
       .trust-grid { grid-template-columns: repeat(2, 1fr); }
       .trust-item:nth-child(3) { border-left: 0; }
       .trust-item:nth-child(n+3) { border-top: 1px solid var(--line); }
@@ -538,7 +538,7 @@
       .trust-grid { grid-template-columns: 1fr; }
       .trust-item + .trust-item { border-left: 0; border-top: 1px solid var(--line); }
       .cat-grid { grid-template-columns: 1fr; gap: 12px; }
-      .cat, .cat:last-child { aspect-ratio: 16 / 11; }
+      .cat, .cat:last-child:nth-child(odd) { aspect-ratio: 16 / 11; }
       .cat-body { padding: 20px; }
       .cat h3 { font-size: 1.2rem; }
       .offer { padding: 32px 22px; }
@@ -1301,35 +1301,61 @@ const siteContent = fetch('/api/gallery').then(r => r.ok ? r.json() : null).catc
   }));
 })();
 
-// ---- Service pages: each service card opens its own section with examples from /panel ----
+// ---- Our services: cards and per-service pages, both editable from /panel ----
 (function () {
   const view = document.getElementById('serviceView');
+  const grid = document.querySelector('.cat-grid');
   const $ = id => document.getElementById(id);
-  const cards = [...document.querySelectorAll('.cat[data-service]')];
   const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  let services = {}, current = null, pushed = false, lastFocus = null;
-  siteContent.then(d => { services = (d && d.services) || {}; if (current) fill(current); });
+  const lang = () => document.documentElement.lang === 'es' ? 'es' : 'en';
+  const tr = o => (o && (o[lang()] || o.es)) || '';
+  let current = null, pushed = false, lastFocus = null;
 
-  const card = id => cards.find(c => c.dataset.service === id);
+  // Until /panel data arrives, use the cards already in the page
+  let services = [...grid.querySelectorAll('.cat[data-service]')].map(c => {
+    const img = c.querySelector('img');
+    const k = c.querySelector('h3').dataset.i18n.split('.')[0];
+    return {
+      id: c.dataset.service, cover: img.getAttribute('src'), pos: img.style.objectPosition, alt: img.alt,
+      title: { es: ES[k + '.h'], en: EN[k + '.h'] }, desc: { es: ES[k + '.p'], en: EN[k + '.p'] }, examples: [],
+    };
+  });
+
+  function renderCards() {
+    const cta = lang() === 'es' ? ES['cat.cta'] : EN['cat.cta'];
+    grid.innerHTML = services.map((s, i) => `
+      <a class="cat" href="#servicio/${esc(s.id)}" data-service="${esc(s.id)}" style="--i:${i}">
+        <img src="${esc(s.cover)}" alt="${esc(s.alt || tr(s.title))}" loading="lazy"${s.pos ? ` style="object-position:${esc(s.pos)}"` : ''}>
+        <div class="cat-body"><div class="cat-num">${String(i + 1).padStart(2, '0')}</div><h3>${esc(tr(s.title))}</h3>${tr(s.desc) ? `<p>${esc(tr(s.desc))}</p>` : ''}<span class="cat-cta"><span>${esc(cta)}</span><svg><use href="#i-arrow"/></svg></span></div>
+      </a>`).join('');
+  }
+
+  siteContent.then(d => {
+    if (!d || !Array.isArray(d.services)) return;
+    services = d.services;
+    renderCards();
+    if (current) services.some(s => s.id === current) ? fill(current) : close();
+    else { const id = fromHash(); if (id) show(id); }
+  });
+
+  const find = id => services.find(s => s.id === id);
   function fill(id) {
-    const c = card(id), img = c.querySelector('img');
-    const name = c.querySelector('h3').textContent.trim();
+    const s = find(id), name = tr(s.title);
     $('svTitle').textContent = name;
-    $('svDesc').textContent = c.querySelector('p').textContent.trim();
-    $('svImg').src = img.getAttribute('src');
-    $('svImg').style.objectPosition = img.style.objectPosition || '';
-    const list = services[id] || [];
-    $('svGrid').innerHTML = list.map((e, j) => `
+    $('svDesc').textContent = tr(s.desc);
+    $('svImg').src = s.cover;
+    $('svImg').style.objectPosition = s.pos || '';
+    $('svGrid').innerHTML = s.examples.map((e, j) => `
       <button type="button" class="sv-item" data-j="${j}">
         <figure><img src="${esc(e.url)}" alt="${esc(e.caption || name)}" loading="lazy">${e.caption ? `<figcaption>${esc(e.caption)}</figcaption>` : ''}</figure>
       </button>`).join('');
-    $('svEmpty').hidden = list.length > 0;
+    $('svEmpty').hidden = s.examples.length > 0;
   }
 
   function show(id) {
-    if (!card(id)) return;
+    if (!find(id)) return;
+    if (current !== id) lastFocus = document.activeElement;
     current = id;
-    lastFocus = document.activeElement;
     fill(id);
     view.hidden = false;
     view.scrollTop = 0;
@@ -1342,16 +1368,17 @@ const siteContent = fetch('/api/gallery').then(r => r.ok ? r.json() : null).catc
     view.classList.remove('open');
     document.body.style.overflow = '';
     setTimeout(() => { if (!current) view.hidden = true; }, 300);
-    if (lastFocus) lastFocus.focus({ preventScroll: true });
+    if (lastFocus && document.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
   }
   // Each service has its own address (#servicio/radios) so Back works and links can be shared
-  const fromHash = () => (location.hash.match(/^#servicio\/([\w-]+)$/) || [])[1];
-  cards.forEach(c => c.addEventListener('click', e => {
+  function fromHash() { return (location.hash.match(/^#servicio\/([\w-]+)$/) || [])[1]; }
+  grid.addEventListener('click', e => {
+    const c = e.target.closest('.cat[data-service]'); if (!c) return;
     e.preventDefault();
     history.pushState({ service: c.dataset.service }, '', '#servicio/' + c.dataset.service);
     pushed = true;
     show(c.dataset.service);
-  }));
+  });
   function close() {
     if (pushed) { pushed = false; history.back(); }
     else { history.replaceState(null, '', '#services'); hide(); }
@@ -1364,11 +1391,13 @@ const siteContent = fetch('/api/gallery').then(r => r.ok ? r.json() : null).catc
   $('svQuoteTop').addEventListener('click', quote);
   $('svGrid').addEventListener('click', e => {
     const b = e.target.closest('.sv-item'); if (!b) return;
-    const list = services[current] || [];
-    openLightbox(list.map(x => ({ src: x.url, caption: x.caption })), $('svTitle').textContent, +b.dataset.j);
+    openLightbox(find(current).examples.map(x => ({ src: x.url, caption: x.caption })), $('svTitle').textContent, +b.dataset.j);
   });
-  // Language toggle: refresh the texts that come from the card
-  document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', () => { if (current) fill(current); }));
+  // Language toggle: titles and descriptions come from the data, not from data-i18n
+  document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', () => {
+    renderCards();
+    if (current) fill(current);
+  }));
   const initial = fromHash();
   if (initial) show(initial);
 })();
