@@ -9,14 +9,15 @@ const SETTINGS = PREFIX + 'cotizaciones-ajustes';
 const MAX_ITEMS = 30;
 
 export const DEFAULT_SETTINGS = {
-  business: 'DS AUDIO',
+  business: '12 Voltec',
   phone: '+1 (520) 979-4376',
   email: 'DsAudio17@gmail.com',
   instagram: 'audio_ds',
   facebook: 'DsAudio',
   validDays: 15,
+  taxRate: 8,
   warranty:
-    'At DsAudio, we are committed to providing our clients with professional, high-quality service in every project we undertake. Therefore, our warranty applies exclusively to the installation of the audio system carried out by our technical team, ensuring that the work is performed correctly and safely.\n\n' +
+    'At 12 Voltec, we are committed to providing our clients with professional, high-quality service in every project we undertake. Therefore, our warranty applies exclusively to the installation of the audio system carried out by our technical team, ensuring that the work is performed correctly and safely.\n\n' +
     'It is important to note that the warranty does not cover products or equipment purchased by the client, as these are protected by the warranty provided by the manufacturer or authorized distributor. In the event that a product presents a manufacturing defect, it will be the client’s responsibility to manage the claim directly with the corresponding supplier.\n\n' +
     'In this way, we guarantee full support for our installation work, always maintaining transparency and professionalism in our relationship with clients.',
 };
@@ -25,6 +26,11 @@ const text = (v, max) => String(v ?? '').trim().slice(0, max);
 const ownBlob = url => typeof url === 'string' && /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\//.test(url);
 const sameOrigin = req => { const o = req.headers.get('origin'); return !o || new URL(o).host === new URL(req.url).host; };
 const validId = id => /^[a-z0-9]{12}$/.test(id || '');
+// Tax percentage, 0–30 with up to 3 decimals (e.g. 8 or 8.7)
+const rate = (v, fallback) => {
+  const n = Number(v);
+  return v === '' || v == null || !Number.isFinite(n) ? fallback : Math.max(0, Math.min(30, Math.round(n * 1000) / 1000));
+};
 
 // Optional text-message alert to the shop (works once Twilio is configured in Vercel)
 async function notifySms(q) {
@@ -92,7 +98,7 @@ function cleanEstimate(e) {
     qty: Math.max(0, Math.min(9999, Number(it?.qty) || 0)),
     price: Math.max(0, Math.min(1e6, Math.round((Number(it?.price) || 0) * 100) / 100)),
   }));
-  return { job: text(e.job, 120), items, notes: text(e.notes, 400) };
+  return { job: text(e.job, 120), items, taxRate: rate(e.taxRate, DEFAULT_SETTINGS.taxRate), notes: text(e.notes, 400) };
 }
 
 // Panel: save an estimate (or the PDF business details with ?settings)
@@ -107,6 +113,7 @@ export async function PUT(request) {
         business: text(b.business, 40) || DEFAULT_SETTINGS.business,
         phone: text(b.phone, 30), email: text(b.email, 80), instagram: text(b.instagram, 40), facebook: text(b.facebook, 40),
         validDays: Math.max(1, Math.min(365, parseInt(b.validDays, 10) || 15)),
+        taxRate: rate(b.taxRate, DEFAULT_SETTINGS.taxRate),
         warranty: text(b.warranty, 3000),
       };
       return json(await writeRecord(SETTINGS, s));

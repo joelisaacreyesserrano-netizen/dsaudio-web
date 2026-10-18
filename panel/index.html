@@ -231,7 +231,12 @@
     .money-in span { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 0.9rem; }
     .money-in .input { padding-left: 22px; width: 100%; }
     .qline { text-align: right; font-size: 0.95rem; }
-    .qtotal { display: flex; align-items: baseline; justify-content: flex-end; gap: 12px; margin: 18px 0 6px; padding-top: 16px; border-top: 2px solid var(--ink); }
+    .qsums { display: grid; gap: 6px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+    .qsums div { display: flex; justify-content: flex-end; align-items: center; gap: 16px; font-size: 0.95rem; }
+    .qsums span { color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
+    .qsums strong { min-width: 96px; text-align: right; }
+    .qrate { width: 72px; height: 34px; padding: 0 8px; text-align: right; }
+    .qtotal { display: flex; align-items: baseline; justify-content: flex-end; gap: 12px; margin: 10px 0 6px; padding-top: 16px; border-top: 2px solid var(--ink); }
     .qtotal span { font-weight: 700; font-size: 0.85rem; letter-spacing: 0.06em; }
     .qtotal strong { font-family: var(--display); font-weight: 800; font-size: 1.8rem; }
     .qtotal small { color: var(--muted); font-weight: 600; }
@@ -410,6 +415,8 @@
     <div class="qd-two">
       <div class="field"><label>Nombre del negocio</label><input class="input" data-st="business" maxlength="40" required></div>
       <div class="field"><label>Vigencia (días)</label><input class="input" data-st="validDays" type="number" min="1" max="365"></div>
+      <div class="field"><label>Tax para cotizaciones nuevas (%)</label><input class="input" data-st="taxRate" type="number" min="0" max="30" step="0.01"></div>
+      <div class="field"></div>
       <div class="field"><label>Teléfono</label><input class="input" data-st="phone" maxlength="30"></div>
       <div class="field"><label>Email</label><input class="input" data-st="email" maxlength="80"></div>
       <div class="field"><label>Instagram</label><input class="input" data-st="instagram" maxlength="40"></div>
@@ -902,7 +909,15 @@ const Q = { list: [], settings: null, filter: 'nueva', open: null, draft: null, 
 const STATUS = { nueva: 'Nueva', cotizada: 'Cotizada', archivada: 'Archivada' };
 const money = n => '$' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
 const carOf = q => [q.year, q.make, q.model].filter(Boolean).join(' ');
-const totalOf = items => items.reduce((s, it) => s + (Number(it.qty) || 0) * (Number(it.price) || 0), 0);
+const subtotalOf = items => items.reduce((s, it) => s + (Number(it.qty) || 0) * (Number(it.price) || 0), 0);
+const round2 = n => Math.round(n * 100) / 100;
+// Subtotal, tax at the estimate's rate (8% unless changed in "Datos del PDF") and final total
+function totals(e) {
+  const subtotal = round2(subtotalOf(e.items));
+  const rate = Number(e.taxRate ?? Q.settings?.taxRate ?? 8) || 0;
+  const tax = round2(subtotal * rate / 100);
+  return { subtotal, rate, tax, total: round2(subtotal + tax) };
+}
 const fmtDate = iso => new Date(iso).toLocaleString('es-MX', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
 
 async function loadQuotes() {
@@ -939,7 +954,7 @@ function renderQuotes() {
         <span>${esc(carOf(q) || 'Vehículo no indicado')}${q.service ? ` · ${esc(q.service)}` : ''}</span>
         ${q.work ? `<p>${esc(q.work)}</p>` : ''}
       </div>
-      <div class="qcard-total">${q.estimate ? money(totalOf(q.estimate.items)) : ''}</div>
+      <div class="qcard-total">${q.estimate ? money(totals(q.estimate).total) : ''}</div>
     </button>`).join('')
     : `<div class="empty">${Q.filter === 'nueva' ? 'No hay cotizaciones nuevas.' : 'No hay cotizaciones aquí.'}</div>`;
 }
@@ -952,6 +967,7 @@ function openQuoteDetail(id) {
     estimate: q.estimate ? JSON.parse(JSON.stringify(q.estimate)) : {
       job: q.service || q.work.slice(0, 80),
       items: [{ desc: '', part: false, qty: 1, price: 0 }, { desc: 'Supplies', part: false, qty: 1, price: 0 }],
+      taxRate: Q.settings?.taxRate ?? 8,
       notes: '',
     },
   };
@@ -999,11 +1015,15 @@ function renderQuoteDetail() {
             </div>`).join('')}
         </div>
         <button type="button" class="btn btn-sm" id="qAddRow" ${e.items.length >= 30 ? 'disabled' : ''}>${icon('i-plus')} Agregar renglón</button>
-        <div class="qtotal"><span>FINAL TOTAL</span><strong id="qTotal">${money(totalOf(e.items))}</strong><small>+ TAX</small></div>
+        <div class="qsums">
+          <div><span>Subtotal</span><strong id="qSub">${money(totals(e).subtotal)}</strong></div>
+          <div><span>Tax <input class="input qrate" data-qe="taxRate" type="number" min="0" max="30" step="0.01" value="${totals(e).rate}" aria-label="Porcentaje de tax"> %</span><strong id="qTax">${money(totals(e).tax)}</strong></div>
+        </div>
+        <div class="qtotal"><span>FINAL TOTAL</span><strong id="qTotal">${money(totals(e).total)}</strong></div>
         <div class="qd-actions">
           <button type="button" class="btn btn-accent" id="qPdf">Descargar PDF</button>
           <button type="button" class="btn btn-dark" id="qSave">Guardar</button>
-          ${d.phone ? `<a class="btn" id="qWa" target="_blank" rel="noopener" href="https://wa.me/${d.phone.replace(/\D/g, '').replace(/^(\d{10})$/, '1$1')}?text=${encodeURIComponent(`Hola ${d.name || ''}, te comparto la cotización para tu ${carOf(d)}. Total: ${money(totalOf(e.items))} + tax.`)}">WhatsApp al cliente</a>` : ''}
+          ${d.phone ? `<a class="btn" id="qWa" target="_blank" rel="noopener" href="https://wa.me/${d.phone.replace(/\D/g, '').replace(/^(\d{10})$/, '1$1')}?text=${encodeURIComponent(`Hola ${d.name || ''}, te comparto la cotización para tu ${carOf(d)}. Total: ${money(totals(e).total)} (tax incluido).`)}">WhatsApp al cliente</a>` : ''}
         </div>
         <div class="qd-more">
           <button type="button" class="link-btn" id="qArchive">${q.status === 'archivada' ? 'Sacar de archivadas' : 'Archivar'}</button>
@@ -1019,7 +1039,10 @@ function recalc() {
     const it = e.items[+r.dataset.i];
     r.querySelector('.qline').textContent = money((Number(it.qty) || 0) * (Number(it.price) || 0));
   });
-  $('#qTotal').textContent = money(totalOf(e.items));
+  const t = totals(e);
+  $('#qSub').textContent = money(t.subtotal);
+  $('#qTax').textContent = money(t.tax);
+  $('#qTotal').textContent = money(t.total);
 }
 
 async function saveQuote(status) {
@@ -1051,7 +1074,7 @@ $('#tab-cotizaciones').addEventListener('click', async e => {
   }
   if (t.id === 'qSave') {
     t.disabled = true;
-    try { await saveQuote(Q.draft.status === 'nueva' && totalOf(Q.draft.estimate.items) > 0 ? 'cotizada' : null); renderQuoteDetail(); updateQuoteBadge(); toast('Cotización guardada', 'ok'); }
+    try { await saveQuote(Q.draft.status === 'nueva' && totals(Q.draft.estimate).subtotal > 0 ? 'cotizada' : null); renderQuoteDetail(); updateQuoteBadge(); toast('Cotización guardada', 'ok'); }
     catch (err) { toast(err.message, 'bad'); t.disabled = false; }
     return;
   }
@@ -1065,7 +1088,7 @@ $('#tab-cotizaciones').addEventListener('click', async e => {
     return;
   }
   if (t.id === 'qArchive') {
-    try { await saveQuote(Q.draft.status === 'archivada' ? (totalOf(Q.draft.estimate.items) > 0 ? 'cotizada' : 'nueva') : 'archivada'); toast('Listo'); Q.open = null; renderQuotes(); }
+    try { await saveQuote(Q.draft.status === 'archivada' ? (totals(Q.draft.estimate).subtotal > 0 ? 'cotizada' : 'nueva') : 'archivada'); toast('Listo'); Q.open = null; renderQuotes(); }
     catch (err) { toast(err.message, 'bad'); }
     return;
   }
@@ -1080,7 +1103,7 @@ $('#tab-cotizaciones').addEventListener('focusin', e => { if (e.target.type === 
 $('#tab-cotizaciones').addEventListener('input', e => {
   const el = e.target, d = Q.draft; if (!d) return;
   if (el.dataset.qd) d[el.dataset.qd] = el.value;
-  if (el.dataset.qe) d.estimate[el.dataset.qe] = el.value;
+  if (el.dataset.qe) { d.estimate[el.dataset.qe] = el.type === 'number' ? (el.value === '' ? 0 : Number(el.value)) : el.value; if (el.type === 'number') recalc(); }
   if (el.dataset.qi) {
     const it = d.estimate.items[+el.closest('.qrow').dataset.i];
     it[el.dataset.qi] = el.type === 'checkbox' ? el.checked : el.type === 'number' ? (el.value === '' ? 0 : Number(el.value)) : el.value;
@@ -1129,23 +1152,27 @@ async function downloadEstimatePdf(q, st) {
   const txt = (s, x, y, o = {}) => doc.text(String(s), X(x), X(y), o);
   const font = (style, size, color = INK) => { doc.setFont('helvetica', style); doc.setFontSize(size); doc.setTextColor(...color); };
   const e = q.estimate || { job: '', items: [] };
-  const name = (st.business || 'DS AUDIO').trim();
-  const [brandA, ...brandRest] = name.split(/\s+/);
-  const brandB = brandRest.join(' ');
+  const ORANGE = [242, 84, 27];
+  const t = totals(e);
 
-  function logo(cx, y, color, size) {
-    // Brand wordmark ("DS AUDIO") with a small sound-wave underneath
-    font('bold', size, color);
-    const aw = doc.getTextWidth(brandA);
-    font('normal', size * 0.62, color);
-    const bw = brandB ? doc.getTextWidth(brandB) + brandB.length * size * 0.18 : 0;
-    const total = aw + (brandB ? X(14) + bw : 0), x0 = cx - total / 2;
-    font('bold', size, color); doc.text(brandA, x0, y);
-    if (brandB) { font('normal', size * 0.62, color); doc.text(brandB, x0 + aw + X(14), y, { charSpace: size * 0.18 }); }
-    doc.setFillColor(...color);
-    const bars = [6, 12, 18, 26, 14, 8, 4, 10, 6, 16, 26, 20, 12, 22, 8];
-    const bx = x0 + aw + X(14);
-    bars.forEach((h, i) => doc.rect(bx + i * X(6.2), y + X(16) - X(h) / 2, X(2.4), X(h), 'F'));
+  // 12 Voltec logo: the dark "12" tile with the orange bolt, then the 12/VOLTEC wordmark
+  function logo(cx, cy, wordColor, slashColor, tile) {
+    font('bold', tile * 0.62, wordColor);
+    const parts = ['12', '/', 'VOLTEC'], gap = tile * 0.28, cs = tile * 0.03;
+    const widths = parts.map(p => doc.getTextWidth(p) + cs * (p.length - 1));
+    const total = tile + gap + widths.reduce((a, b) => a + b, 0);
+    const x0 = cx - total / 2, y0 = cy - tile / 2, u = tile / 40;
+    doc.setFillColor(...INK); doc.roundedRect(x0, y0, tile, tile, 11 * u, 11 * u, 'F');
+    font('bold', 17 * u, [255, 255, 255]); doc.text('12', x0 + 6 * u, y0 + 27 * u);
+    doc.setFillColor(...ORANGE);
+    const bolt = [[30, 7], [23.5, 21], [28, 21], [26, 33], [34, 17.5], [29.2, 17.5]];
+    doc.lines(bolt.slice(1).map((p, i) => [(p[0] - bolt[i][0]) * u, (p[1] - bolt[i][1]) * u]), x0 + bolt[0][0] * u, y0 + bolt[0][1] * u, [1, 1], 'F', true);
+    let x = x0 + tile + gap;
+    parts.forEach((p, i) => {
+      font('bold', tile * 0.62, i === 1 ? slashColor : wordColor);
+      doc.text(p, x, cy + tile * 0.22, { charSpace: cs });
+      x += widths[i];
+    });
   }
 
   // Little red glyphs inside the white circles of the contact block
@@ -1172,7 +1199,7 @@ async function downloadEstimatePdf(q, st) {
   poly([[0, 0], [270, 0], [330, 125], [0, 125]], BLUE);
   poly([[105, 0], [160, 0], [215, 155], [158, 155]], STRIPE);
   poly([[345, 0], [924, 0], [924, 205], [450, 205]], RED);
-  logo(X(785), X(102), [255, 255, 255], 18);
+  logo(X(730), X(100), [255, 255, 255], [255, 255, 255], X(56));
 
   font('bolditalic', 31, BLUE); txt('ESTIMATED', 103, 290, { charSpace: 4 });
   const line = (label, value, y) => { font('bold', 13); txt(label, 103, y); const lw = doc.getTextWidth(label + ' '); font('normal', 13); doc.text(value || '', X(103) + lw, X(y)); };
@@ -1193,21 +1220,17 @@ async function downloadEstimatePdf(q, st) {
   font('bold', 12.5, [255, 255, 255]);
   ['Labor - Parts', 'Amount', 'Price', 'Total'].forEach((h, i) => txt(h, (cols[i][0] + cols[i][1]) / 2, 548, { align: 'center' }));
 
-  const items = e.items.filter(it => it.desc.trim() || it.price);
-  const lastIsSupplies = items.length && /^(supplies|insumos)$/i.test(items[items.length - 1].desc.trim());
-  const body = lastIsSupplies ? items.slice(0, -1) : items.slice();
-  const MIN_ROWS = 11, ROW = 42;
-  while (body.length + (lastIsSupplies ? 1 : 0) < MIN_ROWS) body.push(null);
-  if (lastIsSupplies) body.push(items[items.length - 1]);
+  // Only the lines that were filled in, then the tax line
+  const rows = e.items
+    .filter(it => it.desc.trim() && (Number(it.qty) || 0) * (Number(it.price) || 0) > 0)
+    .map(it => [it.part ? `[ ${it.desc} ]` : it.desc, String(it.qty), money(it.price), money((Number(it.qty) || 0) * (Number(it.price) || 0))]);
+  rows.push([`Tax (${t.rate}%)`, '', money(t.subtotal), money(t.tax)]);
   // Long lists shrink the rows so everything still fits on one page
-  const rowH = Math.min(ROW, 480 / body.length);
+  const rowH = Math.min(42, 480 / rows.length);
   let y = 566;
-  body.forEach(it => {
+  rows.forEach((cells, r) => {
     const mid = y + rowH / 2 + 5;
-    font('bold', Math.min(12.5, rowH * 0.3), INK);
-    const cells = it
-      ? [it.part ? `[ ${it.desc} ]` : it.desc, String(it.qty), money(it.price), money((Number(it.qty) || 0) * (Number(it.price) || 0))]
-      : ['————', '0', '$0', '$0'];
+    font(r === rows.length - 1 ? 'bolditalic' : 'bold', Math.min(12.5, rowH * 0.3), INK);
     cells.forEach((c, i) => {
       let s = c;
       while (i === 0 && doc.getTextWidth(s) > X(cols[0][1] - cols[0][0] - 12) && s.length > 4) s = s.slice(0, -2) + '…';
@@ -1217,8 +1240,7 @@ async function downloadEstimatePdf(q, st) {
     doc.setDrawColor(...BLUE); doc.setLineWidth(X(2)); doc.line(X(103), X(y), X(857), X(y));
   });
 
-  font('bold', 17, BLUE); txt(`FINAL TOTAL:  ${money(totalOf(e.items))}`, 857 - 60, y + 30, { align: 'right' });
-  font('bold', 10.5, BLUE); txt('+ TAX', 745, y + 56, { align: 'center' });
+  font('bold', 17, BLUE); txt(`FINAL TOTAL:  ${money(t.total)}`, 857 - 60, y + 34, { align: 'right' });
 
   // contact block
   poly([[0, 1093], [370, 1093], [432, 1308], [0, 1308]], RED);
@@ -1241,7 +1263,7 @@ async function downloadEstimatePdf(q, st) {
     poly([[0, 0], [285, 0], [285, 57], [0, 57]], BLUE);
     poly([[143, 0], [192, 0], [210, 80], [165, 80]], STRIPE);
     poly([[340, 0], [924, 0], [924, 103], [372, 103]], RED);
-    logo(W / 2, X(210), BLUE, 20);
+    logo(W / 2, X(205), INK, ORANGE, X(60));
     font('bolditalic', 29, STRIPE); txt('SERVICE WARRANTY', 462, 337, { align: 'center' });
     font('normal', 12.5, INK);
     let yy = 400;
