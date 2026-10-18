@@ -272,6 +272,71 @@
     }
     .g-count svg { width: 15px; height: 15px; }
 
+    /* ===== QUOTE FORM ===== */
+    .qf {
+      width: min(520px, calc(100% - 32px)); max-width: none; max-height: calc(100dvh - 32px); margin: auto; padding: 0;
+      border: 0; border-radius: calc(var(--radius) + 4px); background: var(--surface); color: var(--ink);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.3); overflow: hidden;
+    }
+    .qf::backdrop { background: rgba(12,12,13,0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+    .qf[open] { display: flex; flex-direction: column; }
+    .qf-head { padding: 22px 24px 0; }
+    .qf-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .qf-step { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    .qf-close { width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--bg); cursor: pointer; display: grid; place-items: center; color: var(--ink); }
+    .qf-close svg { width: 18px; height: 18px; }
+    .qf-bar { height: 4px; background: var(--line); border-radius: 4px; margin-top: 14px; overflow: hidden; }
+    .qf-bar i { display: block; height: 100%; width: 20%; background: var(--accent); border-radius: 4px; transition: width 0.35s cubic-bezier(.2,.7,.2,1); }
+    .qf-body { padding: 24px; overflow-y: auto; }
+    .qf-service[hidden] { display: none; }
+    .qf-service { display: inline-block; font-size: 0.8rem; font-weight: 600; background: #FFF1EA; color: var(--accent-ink); padding: 4px 12px; border-radius: 999px; margin-bottom: 12px; }
+    .qf h3 { font-family: var(--display); font-stretch: 110%; font-weight: 800; font-size: 1.55rem; line-height: 1.12; letter-spacing: -0.01em; }
+    .qf-hint { color: var(--muted); font-size: 0.92rem; margin-top: 8px; }
+    .qf-input {
+      width: 100%; height: 56px; margin-top: 20px; padding: 0 16px; font: inherit; font-size: 1.05rem; color: var(--ink);
+      border: 1.5px solid var(--line); border-radius: 14px; background: var(--bg); outline: none; transition: border-color 0.2s, background 0.2s;
+      -webkit-appearance: none; appearance: none;
+    }
+    .qf-input:focus { border-color: var(--ink); background: var(--surface); }
+    select.qf-input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%2362656B' stroke-width='2' stroke-linecap='round' d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; background-size: 20px; padding-right: 44px; }
+    .qf-photo {
+      position: relative; margin-top: 20px; aspect-ratio: 4 / 3; border-radius: 16px; overflow: hidden; cursor: pointer;
+      border: 1.5px dashed #C9C6BE; background: var(--bg); display: grid; place-items: center; text-align: center;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .qf-photo:hover { border-color: var(--accent); background: #FFF6F1; }
+    .qf-photo input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+    .qf-photo .ph-empty { color: var(--muted); font-weight: 600; font-size: 0.95rem; padding: 16px; }
+    .qf-photo .ph-empty svg { width: 34px; height: 34px; margin: 0 auto 8px; color: var(--accent); }
+    .qf-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .qf-photo.has { border-style: solid; border-color: var(--line); }
+    .qf-photo .ph-change {
+      position: absolute; right: 12px; bottom: 12px; background: rgba(17,18,20,0.8); color: #fff;
+      font-size: 0.82rem; font-weight: 600; padding: 7px 14px; border-radius: 999px;
+    }
+    .qf-photo .ph-status { position: absolute; left: 12px; top: 12px; background: #fff; font-size: 0.78rem; font-weight: 600; padding: 5px 12px; border-radius: 999px; }
+    .qf-photo .ph-status.ok { color: #1B7F3B; }
+    .qf-photo .ph-status.bad { color: #C62828; }
+    .qf-sum { list-style: none; margin-top: 18px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+    .qf-sum li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; font-size: 0.95rem; }
+    .qf-sum li + li { border-top: 1px solid var(--line); }
+    .qf-sum span { color: var(--muted); }
+    .qf-sum strong { text-align: right; font-weight: 600; }
+    .qf-sum img { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; }
+    .qf-err { color: #C62828; font-size: 0.88rem; margin-top: 12px; min-height: 1.2em; }
+    .qf-foot { display: flex; gap: 10px; padding: 0 24px 24px; }
+    .qf-foot .btn { flex: 1; height: 52px; }
+    .qf-foot .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .btn-wa { background: #25D366; border-color: #25D366; color: #fff; }
+    .btn-wa:hover { background: #1fb457; border-color: #1fb457; }
+    @media (max-width: 640px) {
+      .qf { width: 100%; max-height: 92dvh; margin: auto 0 0; border-radius: 22px 22px 0 0; }
+      .qf-body { padding: 20px 20px 16px; }
+      .qf-head { padding: 18px 20px 0; }
+      .qf-foot { padding: 0 20px calc(20px + env(safe-area-inset-bottom)); }
+      .qf h3 { font-size: 1.35rem; }
+    }
+
     /* ===== LIGHTBOX ===== */
     .lb {
       position: fixed; inset: 0; z-index: 200; width: 100%; height: 100%; max-width: none; max-height: none;
@@ -408,6 +473,7 @@
   <symbol id="i-chev-l" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 5l-7 7 7 7"/></symbol>
   <symbol id="i-chev-r" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></symbol>
   <symbol id="i-photos" viewBox="0 0 24 24"><rect x="7" y="3.5" width="13.5" height="13.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M16.5 20.5h-10a3 3 0 0 1-3-3v-10"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.2l1.5-2.2h5.6L16.3 7h2.2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="12.8" r="3.4" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4 8h16M4 16h16"/></symbol>
   <symbol id="logo" viewBox="0 0 40 40"><rect width="40" height="40" rx="11" fill="#111214"/><text x="6" y="27" font-family="Archivo, sans-serif" font-weight="800" font-size="17" fill="#fff" letter-spacing="-0.5">12</text><path d="M30 7 23.5 21h4.5l-2 12 8-15.5h-4.8z" fill="#F2541B"/></symbol>
 </svg>
@@ -455,7 +521,7 @@
         <div class="hero-side">
           <p data-i18n="hero.sub">Screens, speakers, amplifiers, lighting and safety tech — professionally installed and tuned for your vehicle.</p>
           <div class="hero-cta">
-            <a href="tel:+15209794376" class="btn btn-dark" data-i18n="cta.quote">Get a Free Quote</a>
+            <a href="tel:+15209794376" class="btn btn-dark" data-quote data-i18n="cta.quote">Get a Free Quote</a>
             <a href="#services" class="btn btn-line" data-i18n="cta.services">Explore Services</a>
           </div>
         </div>
@@ -489,43 +555,43 @@
           <h2 class="display" data-i18n="svc.title">Our services</h2>
           <p class="lead" data-i18n="svc.lead">From a simple speaker swap to a full custom build, every job gets the same clean, careful work.</p>
         </div>
-        <a href="tel:+15209794376" class="btn btn-line" data-i18n="cta.quote">Get a Free Quote</a>
+        <a href="tel:+15209794376" class="btn btn-line" data-quote data-i18n="cta.quote">Get a Free Quote</a>
       </div>
 
       <div class="cat-grid rv">
-        <a class="cat" href="#contact" style="--i:0">
+        <a class="cat" href="#contact" data-quote style="--i:0">
           <img src="img/screen.jpg" alt="Apple CarPlay touchscreen radio installed in a Ford Mustang dash" loading="lazy" style="object-position:center 45%">
           <div class="cat-body"><div class="cat-num">01</div><h3 data-i18n="c1.h">Radios</h3><p data-i18n="c1.p">Touchscreens with Apple CarPlay, Android Auto and Bluetooth.</p><span class="cat-cta"><span data-i18n="cat.cta">Get a quote</span><svg><use href="#i-arrow"/></svg></span></div>
         </a>
-        <a class="cat" href="#contact" style="--i:1">
+        <a class="cat" href="#contact" data-quote style="--i:1">
           <img src="img/amplifier.jpg" alt="Two amplifiers installed in a vehicle" loading="lazy" style="object-position:center 70%">
           <div class="cat-body"><div class="cat-num">02</div><h3 data-i18n="c2.h">4 &amp; 5 Channel Amplifiers</h3><p data-i18n="c2.p">Clean power for your whole system, installed and tuned.</p><span class="cat-cta"><span data-i18n="cat.cta">Get a quote</span><svg><use href="#i-arrow"/></svg></span></div>
         </a>
-        <a class="cat" href="#contact" style="--i:2">
+        <a class="cat" href="#contact" data-quote style="--i:2">
           <img src="img/sub-amp.jpg" alt="Dual subwoofer box installed in an SUV cargo area" loading="lazy" style="object-position:center 62%">
           <div class="cat-body"><div class="cat-num">03</div><h3 data-i18n="c3.h">Sub Amplifiers</h3><p data-i18n="c3.p">Dedicated power so your bass hits clean and hard.</p><span class="cat-cta"><span data-i18n="cat.cta">Get a quote</span><svg><use href="#i-arrow"/></svg></span></div>
         </a>
-        <a class="cat" href="#contact" style="--i:3">
+        <a class="cat" href="#contact" data-quote style="--i:3">
           <img src="img/speakers-door.jpg" alt="Upgraded door speaker installed in a Ford Bronco" loading="lazy" style="object-position:center 60%">
           <div class="cat-body"><div class="cat-num">04</div><h3 data-i18n="c4.h">Speakers</h3><p data-i18n="c4.p">Component and coaxial upgrades with real clarity.</p><span class="cat-cta"><span data-i18n="cat.cta">Get a quote</span><svg><use href="#i-arrow"/></svg></span></div>
         </a>
-        <a class="cat" href="#contact" style="--i:4">
+        <a class="cat" href="#contact" data-quote style="--i:4">
           <img src="img/sound-damping.jpg" alt="Car door interior panel" loading="lazy" style="object-position:center 55%">
           <div class="cat-body"><div class="cat-num">05</div><h3 data-i18n="c5.h">Sound Damping</h3><p data-i18n="c5.p">Less road noise and rattles, better sound inside.</p><span class="cat-cta"><span data-i18n="cat.cta">Get a quote</span><svg><use href="#i-arrow"/></svg></span></div>
         </a>
-        <a class="cat" href="#contact" style="--i:5">
+        <a class="cat" href="#contact" data-quote style="--i:5">
           <img src="img/backup-camera.jpg" alt="Backup camera view shown on an aftermarket radio screen in a Mustang" loading="lazy" style="object-position:center 55%">
           <div class="cat-body"><div class="cat-num">06</div><h3 data-i18n="c6.h">Backup Cameras</h3><p data-i18n="c6.p">Your rear view, right on your radio screen.</p><span class="cat-cta"><span data-i18n="cat.cta">Get a quote</span><svg><use href="#i-arrow"/></svg></span></div>
         </a>
-        <a class="cat" href="#contact" style="--i:6">
+        <a class="cat" href="#contact" data-quote style="--i:6">
           <img src="img/dash-cam.jpg" alt="Dash cam installed on a windshield" loading="lazy" style="object-position:center 55%">
           <div class="cat-body"><div class="cat-num">07</div><h3 data-i18n="c7.h">Dash Cams</h3><p data-i18n="c7.p">Front and rear, hardwired with hidden routing.</p><span class="cat-cta"><span data-i18n="cat.cta">Get a quote</span><svg><use href="#i-arrow"/></svg></span></div>
         </a>
-        <a class="cat" href="#contact" style="--i:7">
+        <a class="cat" href="#contact" data-quote style="--i:7">
           <img src="img/radar-detector.jpg" alt="Radar detector mounted on a windshield at night" loading="lazy" style="object-position:center 35%">
           <div class="cat-body"><div class="cat-num">08</div><h3 data-i18n="c8.h">Radar</h3><p data-i18n="c8.p">Hardwired and always on — no cords hanging.</p><span class="cat-cta"><span data-i18n="cat.cta">Get a quote</span><svg><use href="#i-arrow"/></svg></span></div>
         </a>
-        <a class="cat" href="#contact" style="--i:8">
+        <a class="cat" href="#contact" data-quote style="--i:8">
           <img src="img/lighting.jpg" alt="Car interior with red ambient lighting" loading="lazy" style="object-position:center 60%">
           <div class="cat-body"><div class="cat-num">09</div><h3 data-i18n="c9.h">Lighting</h3><p data-i18n="c9.p">Ambient interior, underglow and wheel-well lights.</p><span class="cat-cta"><span data-i18n="cat.cta">Get a quote</span><svg><use href="#i-arrow"/></svg></span></div>
         </a>
@@ -590,7 +656,7 @@
           <span class="eyebrow" data-i18n="p.eyebrow">How it works</span>
           <h2 class="display" data-i18n="p.title">Your build in three steps</h2>
         </div>
-        <a href="tel:+15209794376" class="btn btn-dark" data-i18n="cta.quote">Get a Free Quote</a>
+        <a href="tel:+15209794376" class="btn btn-dark" data-quote data-i18n="cta.quote">Get a Free Quote</a>
       </div>
       <div class="steps rv">
         <div class="step"><div class="step-n">01</div><h3 data-i18n="p1.h">Tell us what you want</h3><p data-i18n="p1.p">Call, text or DM us with your vehicle and what you have in mind.</p></div>
@@ -670,6 +736,31 @@
     <div class="footer-copy">© <span id="year">2026</span> 12 Voltec. <span data-i18n="f.rights">All rights reserved.</span></div>
   </div>
 </footer>
+
+<dialog class="qf" id="quote" aria-labelledby="qfTitle">
+  <div class="qf-head">
+    <div class="qf-top">
+      <span class="qf-step" id="qfStep"></span>
+      <button type="button" class="qf-close" id="qfClose" aria-label="Close"><svg><use href="#i-x"/></svg></button>
+    </div>
+    <div class="qf-bar"><i id="qfBar"></i></div>
+  </div>
+  <form class="qf-body" id="qfForm" novalidate>
+    <span class="qf-service" id="qfService" hidden></span>
+    <h3 id="qfTitle"></h3>
+    <p class="qf-hint" id="qfHint"></p>
+    <div id="qfField"></div>
+    <div class="qf-err" id="qfErr" role="alert"></div>
+  </form>
+  <div class="qf-foot">
+    <button type="button" class="btn btn-line" id="qfBack"></button>
+    <button type="button" class="btn btn-dark" id="qfNext"></button>
+  </div>
+</dialog>
+
+<datalist id="qfMakes">
+  <option>Acura</option><option>Audi</option><option>BMW</option><option>Buick</option><option>Cadillac</option><option>Chevrolet</option><option>Chrysler</option><option>Dodge</option><option>Fiat</option><option>Ford</option><option>Genesis</option><option>GMC</option><option>Honda</option><option>Hyundai</option><option>Infiniti</option><option>Jeep</option><option>Kia</option><option>Land Rover</option><option>Lexus</option><option>Lincoln</option><option>Mazda</option><option>Mercedes-Benz</option><option>Mini</option><option>Mitsubishi</option><option>Nissan</option><option>Polaris</option><option>Ram</option><option>Subaru</option><option>Tesla</option><option>Toyota</option><option>Volkswagen</option><option>Volvo</option>
+</datalist>
 
 <dialog class="lb" id="lightbox" aria-label="Photos">
   <div class="lb-top">
@@ -780,6 +871,176 @@ document.querySelectorAll('.rv').forEach(el => io.observe(el));
 })();
 
 document.getElementById('year').textContent = new Date().getFullYear();
+
+// ---- Quote form: 5 quick questions, then a ready-to-send WhatsApp message ----
+(function () {
+  const WA_NUMBER = '15209794376';
+  const T = {
+    en: {
+      step: (n, t) => `Step ${n} of ${t}`, review: 'Review',
+      year: 'What year is your vehicle?', yearPh: 'Select the year',
+      make: 'What make is it?', makeHint: 'For example: Toyota, Ford, Chevrolet.', makePh: 'Make',
+      model: 'And the model?', modelHint: 'For example: Tacoma, F-150, Silverado.', modelPh: 'Model',
+      dash: 'Take a photo of your dashboard', dashHint: 'Show the radio and the whole center console so we can see what you have today.',
+      door: "Photo of the driver's door label", doorHint: "Open the driver's door: the sticker is on the door frame (it has the VIN and build date).",
+      tap: 'Tap to take or choose a photo', change: 'Change', uploading: 'Uploading…', uploaded: 'Ready', failed: 'Upload failed — try again',
+      sumTitle: 'All set! Send it to us on WhatsApp', sumHint: 'We will reply with your quote. You can add anything else in the chat.',
+      vehicle: 'Vehicle', dashS: 'Dashboard', doorS: 'Door label',
+      back: 'Back', next: 'Next', retry: 'Retake photo', send: 'Send on WhatsApp', wait: 'Uploading photos…',
+      required: 'Please answer to continue.', photoRequired: 'Please add the photo to continue.',
+      msg: (d) => `Hi 12 Voltec! I'd like a quote.` + (d.service ? `\nService: ${d.service}` : '') +
+        `\n\nVehicle: ${d.year} ${d.make} ${d.model}\nDashboard photo: ${d.dash}\nDriver's door label: ${d.door}`,
+    },
+    es: {
+      step: (n, t) => `Paso ${n} de ${t}`, review: 'Resumen',
+      year: '¿De qué año es tu vehículo?', yearPh: 'Selecciona el año',
+      make: '¿De qué marca es?', makeHint: 'Por ejemplo: Toyota, Ford, Chevrolet.', makePh: 'Marca',
+      model: '¿Y el modelo?', modelHint: 'Por ejemplo: Tacoma, F-150, Silverado.', modelPh: 'Modelo',
+      dash: 'Toma una foto de tu tablero', dashHint: 'Que se vea el radio y toda la consola central, para ver qué tienes hoy.',
+      door: 'Foto de la etiqueta de la puerta del conductor', doorHint: 'Abre la puerta del conductor: la etiqueta está en el marco de la puerta (trae el VIN y la fecha de fabricación).',
+      tap: 'Toca para tomar o elegir una foto', change: 'Cambiar', uploading: 'Subiendo…', uploaded: 'Lista', failed: 'No se pudo subir — intenta de nuevo',
+      sumTitle: '¡Listo! Envíanoslo por WhatsApp', sumHint: 'Te responderemos con tu cotización. Puedes agregar cualquier detalle en el chat.',
+      vehicle: 'Vehículo', dashS: 'Tablero', doorS: 'Etiqueta de puerta',
+      back: 'Atrás', next: 'Siguiente', retry: 'Volver a tomar la foto', send: 'Enviar por WhatsApp', wait: 'Subiendo fotos…',
+      required: 'Responde para continuar.', photoRequired: 'Agrega la foto para continuar.',
+      msg: (d) => `¡Hola 12 Voltec! Quiero una cotización.` + (d.service ? `\nServicio: ${d.service}` : '') +
+        `\n\nVehículo: ${d.year} ${d.make} ${d.model}\nFoto del tablero: ${d.dash}\nEtiqueta de la puerta del conductor: ${d.door}`,
+    },
+  };
+  const STEPS = ['year', 'make', 'model', 'dash', 'door'];
+  const dlg = document.getElementById('quote');
+  const $ = id => document.getElementById(id);
+  let t = T.en, step = 0, data = {}, photos = {};
+
+  const thisYear = new Date().getFullYear();
+  const years = Array.from({ length: thisYear + 2 - 1980 }, (_, i) => thisYear + 1 - i);
+  const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  // Phone photos are big: shrink before uploading so it's fast on mobile data
+  async function shrink(file) {
+    try {
+      const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
+      const k = Math.min(1, 1800 / Math.max(bmp.width, bmp.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+      c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+      return await new Promise(r => c.toBlob(r, 'image/jpeg', 0.85)) || file;
+    } catch { return file; }
+  }
+  function uploadPhoto(kind, file) {
+    const p = photos[kind] = { preview: URL.createObjectURL(file), url: null, error: false };
+    p.done = shrink(file)
+      .then(body => fetch('/api/quote-photo?kind=' + kind, { method: 'POST', headers: { 'content-type': 'image/jpeg' }, body }))
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(d => { p.url = d.url; })
+      .catch(() => { p.error = true; })
+      .finally(() => { if (photos[kind] === p) render(); });
+    render();
+  }
+
+  function field(key) {
+    if (key === 'year') return `<select class="qf-input" id="qfIn" autocomplete="off"><option value="">${t.yearPh}</option>${years.map(y => `<option${String(y) === data.year ? ' selected' : ''}>${y}</option>`).join('')}</select>`;
+    if (key === 'make') return `<input class="qf-input" id="qfIn" list="qfMakes" autocomplete="off" autocapitalize="words" maxlength="40" placeholder="${t.makePh}" value="${esc(data.make || '')}">`;
+    if (key === 'model') return `<input class="qf-input" id="qfIn" autocomplete="off" autocapitalize="words" maxlength="60" placeholder="${t.modelPh}" value="${esc(data.model || '')}">`;
+    const p = photos[key];
+    const status = !p ? '' : p.error ? `<span class="ph-status bad">${t.failed}</span>` : p.url ? `<span class="ph-status ok">✓ ${t.uploaded}</span>` : `<span class="ph-status">${t.uploading}</span>`;
+    return `<label class="qf-photo${p ? ' has' : ''}">
+      ${p ? `<img src="${p.preview}" alt="">${status}<span class="ph-change">${t.change}</span>`
+          : `<span class="ph-empty"><svg><use href="#i-camera"/></svg>${t.tap}</span>`}
+      <input type="file" accept="image/*" capture="environment" id="qfFile">
+    </label>`;
+  }
+
+  function render() {
+    const total = STEPS.length, onSummary = step === total;
+    $('qfStep').textContent = onSummary ? t.review : t.step(step + 1, total);
+    $('qfBar').style.width = ((onSummary ? total : step + 1) / total * 100) + '%';
+    $('qfErr').textContent = '';
+    $('qfBack').textContent = t.back;
+    $('qfBack').style.visibility = step === 0 ? 'hidden' : '';
+    const next = $('qfNext');
+    if (onSummary) {
+      const failed = STEPS.slice(3).find(k => photos[k].error);
+      const pending = STEPS.slice(3).some(k => !photos[k].url);
+      $('qfTitle').textContent = t.sumTitle;
+      $('qfHint').textContent = t.sumHint;
+      $('qfHint').hidden = false;
+      $('qfField').innerHTML = `<ul class="qf-sum">
+        <li><span>${t.vehicle}</span><strong>${esc(`${data.year} ${data.make} ${data.model}`)}</strong></li>
+        <li><span>${t.dashS}</span><img src="${photos.dash.preview}" alt=""></li>
+        <li><span>${t.doorS}</span><img src="${photos.door.preview}" alt=""></li>
+      </ul>`;
+      if (failed) {
+        $('qfErr').textContent = t.failed;
+        next.className = 'btn btn-dark'; next.textContent = t.retry; next.disabled = false;
+        return;
+      }
+      next.className = 'btn btn-wa';
+      next.innerHTML = pending ? t.wait : `<svg><use href="#i-wa"/></svg>${t.send}`;
+      next.disabled = pending;
+      return;
+    }
+    const key = STEPS[step];
+    $('qfTitle').textContent = t[key];
+    $('qfHint').textContent = t[key + 'Hint'] || '';
+    $('qfHint').hidden = !t[key + 'Hint'];
+    $('qfField').innerHTML = field(key);
+    next.className = 'btn btn-dark'; next.textContent = t.next; next.disabled = false;
+    const inp = $('qfIn');
+    if (inp && matchMedia('(hover: hover)').matches) inp.focus();
+    const file = $('qfFile');
+    if (file) file.addEventListener('change', () => { if (file.files[0]) uploadPhoto(key, file.files[0]); });
+  }
+
+  function valid() {
+    const key = STEPS[step];
+    if (step >= STEPS.length) return true;
+    if (key === 'dash' || key === 'door') {
+      if (photos[key] && photos[key].error) { $('qfErr').textContent = t.failed; return false; }
+      if (!photos[key]) { $('qfErr').textContent = t.photoRequired; return false; }
+      return true;
+    }
+    const v = $('qfIn').value.trim();
+    if (!v) { $('qfErr').textContent = t.required; $('qfIn').focus(); return false; }
+    data[key] = v;
+    return true;
+  }
+
+  function go(n) { step = Math.max(0, Math.min(STEPS.length, n)); render(); $('qfForm').scrollTop = 0; }
+
+  $('qfNext').addEventListener('click', () => {
+    if (step < STEPS.length) { if (valid()) go(step + 1); return; }
+    const failed = STEPS.slice(3).find(k => photos[k].error);
+    if (failed) return go(STEPS.indexOf(failed));
+    const msg = t.msg({ ...data, dash: photos.dash.url, door: photos.door.url });
+    window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
+    step = 0; data = {}; photos = {};
+    dlg.close();
+  });
+  $('qfBack').addEventListener('click', () => { if (step < STEPS.length && step < 3) { const i = $('qfIn'); if (i) data[STEPS[step]] = i.value.trim(); } go(step - 1); });
+  $('qfForm').addEventListener('submit', e => { e.preventDefault(); $('qfNext').click(); });
+  $('qfForm').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'qfIn') { e.preventDefault(); $('qfNext').click(); } });
+  $('qfClose').addEventListener('click', () => dlg.close());
+  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+  dlg.addEventListener('close', () => { document.body.style.overflow = ''; });
+
+  function open(service) {
+    t = document.documentElement.lang === 'es' ? T.es : T.en;
+    // Answers and photos survive closing the form by accident; only sending clears them
+    data.service = service;
+    $('qfService').hidden = !service;
+    $('qfService').textContent = service || '';
+    dlg.showModal();
+    document.body.style.overflow = 'hidden';
+    go(step);
+  }
+  document.querySelectorAll('[data-quote]').forEach(el => el.addEventListener('click', e => {
+    if (!window.HTMLDialogElement) return; // very old browsers keep the phone link
+    e.preventDefault();
+    const h3 = el.querySelector('h3');
+    open(h3 ? h3.textContent.trim() : '');
+  }));
+})();
 
 // ---- "Built in our shop": covers and related photos come from /panel ----
 (function () {
