@@ -5,6 +5,12 @@ export const PREFIX = process.env.VERCEL_ENV === 'production' ? 'taller/' : 'tal
 const DATA_PREFIX = PREFIX + 'data-';
 export const PHOTO_PREFIX = PREFIX + 'fotos/';
 
+// Service ids, in the order the cards appear in "Our services"
+export const SERVICE_IDS = [
+  'radios', 'amplificadores', 'amplificadores-sub', 'bocinas', 'aislamiento',
+  'camaras-reversa', 'camaras-tablero', 'radar', 'iluminacion',
+];
+
 export const DEFAULT_GALLERY = {
   items: [
     { cover: 'img/work-1.jpg', title: '', alt: 'Black Ford Bronco with red lighting in the shop', photos: [] },
@@ -14,6 +20,8 @@ export const DEFAULT_GALLERY = {
   ],
   // "Satisfied customers" cases shown from the Before & after section
   clients: [],
+  // Example photos per service: { radios: [{ url, caption }], ... }
+  services: {},
 };
 
 async function listAll(prefix) {
@@ -35,7 +43,7 @@ export async function readGallery() {
   const res = await fetch(files[0].url);
   if (!res.ok) throw new Error('No se pudo leer la galería');
   const data = await res.json();
-  return { ...data, clients: data.clients || [] };
+  return { ...data, clients: data.clients || [], services: data.services || {} };
 }
 
 export async function writeGallery(gallery) {
@@ -54,6 +62,7 @@ async function removeUnusedPhotos(gallery) {
   const used = new Set([
     ...gallery.items.flatMap(i => [i.cover, ...i.photos]),
     ...gallery.clients.flatMap(c => [c.before, c.after]),
+    ...Object.values(gallery.services).flat().map(e => e.url),
   ]);
   const cutoff = Date.now() - 60 * 60 * 1000;
   const stale = (await listAll(PHOTO_PREFIX))

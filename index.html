@@ -322,6 +322,50 @@
     }
     .g-count svg { width: 15px; height: 15px; }
 
+    /* ===== SERVICE PAGE ===== */
+    .sv {
+      position: fixed; inset: 0; z-index: 150; background: var(--bg); overflow-y: auto; overscroll-behavior: contain;
+      opacity: 0; transform: translateY(16px); transition: opacity 0.3s, transform 0.35s cubic-bezier(.2,.7,.2,1);
+    }
+    .sv.open { opacity: 1; transform: none; }
+    .sv:focus { outline: none; }
+    .sv-bar { position: sticky; top: 0; z-index: 2; background: rgba(247,246,242,0.9); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+    .sv-bar-inner { height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .sv-back { display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 16px 0 10px; border: 1.5px solid var(--line); border-radius: 999px; background: var(--surface); cursor: pointer; font: inherit; font-weight: 600; font-size: 0.9rem; color: var(--ink); }
+    .sv-back:hover { border-color: var(--ink); }
+    .sv-back svg { width: 18px; height: 18px; }
+    .sv-quote-top { height: 44px; padding: 0 20px; font-size: 0.88rem; }
+    .sv-hero { position: relative; margin-top: 28px; border-radius: calc(var(--radius) + 6px); overflow: hidden; aspect-ratio: 21 / 8; background: var(--ink); }
+    .sv-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .sv-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,10,12,0.88) 0%, rgba(10,10,12,0.4) 55%, rgba(10,10,12,0.1) 100%); }
+    .sv-hero-body { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; padding: 36px; color: #fff; }
+    .sv-hero-body .eyebrow { color: rgba(255,255,255,0.8); }
+    .sv-hero-body h2.display { margin: 10px 0 8px; }
+    .sv-hero-body p { color: rgba(255,255,255,0.85); max-width: 520px; }
+    .sv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; }
+    .sv-item { position: relative; border: 0; padding: 0; border-radius: var(--radius); overflow: hidden; background: #ddd; aspect-ratio: 4 / 5; cursor: zoom-in; font: inherit; text-align: left; }
+    .sv-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s cubic-bezier(.2,.7,.2,1); }
+    .sv-item:hover img { transform: scale(1.05); }
+    .sv-item:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+    .sv-item figcaption {
+      position: absolute; left: 12px; right: 12px; bottom: 12px; background: rgba(255,255,255,0.94); color: var(--ink);
+      border-radius: 12px; padding: 10px 14px; font-size: 0.88rem; font-weight: 600; line-height: 1.35;
+    }
+    .sv-empty { margin-top: 24px; padding: 40px 24px; text-align: center; color: var(--muted); border: 1.5px dashed var(--line); border-radius: var(--radius); }
+    .sv-cta { display: flex; justify-content: center; padding: 36px 0 72px; }
+    @media (max-width: 1020px) { .sv-grid { grid-template-columns: repeat(2, 1fr); } .sv-hero { aspect-ratio: 16 / 9; } }
+    @media (max-width: 640px) {
+      .sv-bar-inner { height: 60px; }
+      .sv-quote-top { display: none; }
+      .sv-hero { aspect-ratio: 4 / 5; margin-top: 16px; }
+      .sv-hero-body { padding: 22px; }
+      .sv-grid { gap: 10px; margin-top: 16px; }
+      .sv-item figcaption { left: 8px; right: 8px; bottom: 8px; padding: 8px 10px; font-size: 0.78rem; }
+      .sv-cta { position: sticky; bottom: 0; padding: 16px 0 calc(16px + env(safe-area-inset-bottom)); background: linear-gradient(to top, var(--bg) 70%, rgba(247,246,242,0)); }
+      .sv-cta .btn { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) { .sv { transition: none; transform: none; } }
+
     /* ===== QUOTE FORM ===== */
     .qf {
       width: min(520px, calc(100% - 32px)); max-width: none; max-height: calc(100dvh - 32px); margin: auto; padding: 0;
@@ -621,41 +665,41 @@
       </div>
 
       <div class="cat-grid rv">
-        <a class="cat" href="#contact" data-quote style="--i:0">
+        <a class="cat" href="#servicio/radios" data-service="radios" style="--i:0">
           <img src="img/screen.jpg" alt="Apple CarPlay touchscreen radio installed in a Ford Mustang dash" loading="lazy" style="object-position:center 45%">
-          <div class="cat-body"><div class="cat-num">01</div><h3 data-i18n="c1.h">Radios</h3><p data-i18n="c1.p">Touchscreens with Apple CarPlay, Android Auto and Bluetooth.</p><span class="cat-cta"><span data-i18n="cat.cta">Get a quote</span><svg><use href="#i-arrow"/></svg></span></div>
+          <div class="cat-body"><div class="cat-num">01</div><h3 data-i18n="c1.h">Radios</h3><p data-i18n="c1.p">Touchscreens with Apple CarPlay, Android Auto and Bluetooth.</p><span class="cat-cta"><span data-i18n="cat.cta">See our work</span><svg><use href="#i-arrow"/></svg></span></div>
         </a>
-        <a class="cat" href="#contact" data-quote style="--i:1">
+        <a class="cat" href="#servicio/amplificadores" data-service="amplificadores" style="--i:1">
           <img src="img/amplifier.jpg" alt="Two amplifiers installed in a vehicle" loading="lazy" style="object-position:center 70%">
-          <div class="cat-body"><div class="cat-num">02</div><h3 data-i18n="c2.h">4 &amp; 5 Channel Amplifiers</h3><p data-i18n="c2.p">Clean power for your whole system, installed and tuned.</p><span class="cat-cta"><span data-i18n="cat.cta">Get a quote</span><svg><use href="#i-arrow"/></svg></span></div>
+          <div class="cat-body"><div class="cat-num">02</div><h3 data-i18n="c2.h">4 &amp; 5 Channel Amplifiers</h3><p data-i18n="c2.p">Clean power for your whole system, installed and tuned.</p><span class="cat-cta"><span data-i18n="cat.cta">See our work</span><svg><use href="#i-arrow"/></svg></span></div>
         </a>
-        <a class="cat" href="#contact" data-quote style="--i:2">
+        <a class="cat" href="#servicio/amplificadores-sub" data-service="amplificadores-sub" style="--i:2">
           <img src="img/sub-amp.jpg" alt="Dual subwoofer box installed in an SUV cargo area" loading="lazy" style="object-position:center 62%">
-          <div class="cat-body"><div class="cat-num">03</div><h3 data-i18n="c3.h">Sub Amplifiers</h3><p data-i18n="c3.p">Dedicated power so your bass hits clean and hard.</p><span class="cat-cta"><span data-i18n="cat.cta">Get a quote</span><svg><use href="#i-arrow"/></svg></span></div>
+          <div class="cat-body"><div class="cat-num">03</div><h3 data-i18n="c3.h">Sub Amplifiers</h3><p data-i18n="c3.p">Dedicated power so your bass hits clean and hard.</p><span class="cat-cta"><span data-i18n="cat.cta">See our work</span><svg><use href="#i-arrow"/></svg></span></div>
         </a>
-        <a class="cat" href="#contact" data-quote style="--i:3">
+        <a class="cat" href="#servicio/bocinas" data-service="bocinas" style="--i:3">
           <img src="img/speakers-door.jpg" alt="Upgraded door speaker installed in a Ford Bronco" loading="lazy" style="object-position:center 60%">
-          <div class="cat-body"><div class="cat-num">04</div><h3 data-i18n="c4.h">Speakers</h3><p data-i18n="c4.p">Component and coaxial upgrades with real clarity.</p><span class="cat-cta"><span data-i18n="cat.cta">Get a quote</span><svg><use href="#i-arrow"/></svg></span></div>
+          <div class="cat-body"><div class="cat-num">04</div><h3 data-i18n="c4.h">Speakers</h3><p data-i18n="c4.p">Component and coaxial upgrades with real clarity.</p><span class="cat-cta"><span data-i18n="cat.cta">See our work</span><svg><use href="#i-arrow"/></svg></span></div>
         </a>
-        <a class="cat" href="#contact" data-quote style="--i:4">
+        <a class="cat" href="#servicio/aislamiento" data-service="aislamiento" style="--i:4">
           <img src="img/sound-damping.jpg" alt="Car door interior panel" loading="lazy" style="object-position:center 55%">
-          <div class="cat-body"><div class="cat-num">05</div><h3 data-i18n="c5.h">Sound Damping</h3><p data-i18n="c5.p">Less road noise and rattles, better sound inside.</p><span class="cat-cta"><span data-i18n="cat.cta">Get a quote</span><svg><use href="#i-arrow"/></svg></span></div>
+          <div class="cat-body"><div class="cat-num">05</div><h3 data-i18n="c5.h">Sound Damping</h3><p data-i18n="c5.p">Less road noise and rattles, better sound inside.</p><span class="cat-cta"><span data-i18n="cat.cta">See our work</span><svg><use href="#i-arrow"/></svg></span></div>
         </a>
-        <a class="cat" href="#contact" data-quote style="--i:5">
+        <a class="cat" href="#servicio/camaras-reversa" data-service="camaras-reversa" style="--i:5">
           <img src="img/backup-camera.jpg" alt="Backup camera view shown on an aftermarket radio screen in a Mustang" loading="lazy" style="object-position:center 55%">
-          <div class="cat-body"><div class="cat-num">06</div><h3 data-i18n="c6.h">Backup Cameras</h3><p data-i18n="c6.p">Your rear view, right on your radio screen.</p><span class="cat-cta"><span data-i18n="cat.cta">Get a quote</span><svg><use href="#i-arrow"/></svg></span></div>
+          <div class="cat-body"><div class="cat-num">06</div><h3 data-i18n="c6.h">Backup Cameras</h3><p data-i18n="c6.p">Your rear view, right on your radio screen.</p><span class="cat-cta"><span data-i18n="cat.cta">See our work</span><svg><use href="#i-arrow"/></svg></span></div>
         </a>
-        <a class="cat" href="#contact" data-quote style="--i:6">
+        <a class="cat" href="#servicio/camaras-tablero" data-service="camaras-tablero" style="--i:6">
           <img src="img/dash-cam.jpg" alt="Dash cam installed on a windshield" loading="lazy" style="object-position:center 55%">
-          <div class="cat-body"><div class="cat-num">07</div><h3 data-i18n="c7.h">Dash Cams</h3><p data-i18n="c7.p">Front and rear, hardwired with hidden routing.</p><span class="cat-cta"><span data-i18n="cat.cta">Get a quote</span><svg><use href="#i-arrow"/></svg></span></div>
+          <div class="cat-body"><div class="cat-num">07</div><h3 data-i18n="c7.h">Dash Cams</h3><p data-i18n="c7.p">Front and rear, hardwired with hidden routing.</p><span class="cat-cta"><span data-i18n="cat.cta">See our work</span><svg><use href="#i-arrow"/></svg></span></div>
         </a>
-        <a class="cat" href="#contact" data-quote style="--i:7">
+        <a class="cat" href="#servicio/radar" data-service="radar" style="--i:7">
           <img src="img/radar-detector.jpg" alt="Radar detector mounted on a windshield at night" loading="lazy" style="object-position:center 35%">
-          <div class="cat-body"><div class="cat-num">08</div><h3 data-i18n="c8.h">Radar</h3><p data-i18n="c8.p">Hardwired and always on — no cords hanging.</p><span class="cat-cta"><span data-i18n="cat.cta">Get a quote</span><svg><use href="#i-arrow"/></svg></span></div>
+          <div class="cat-body"><div class="cat-num">08</div><h3 data-i18n="c8.h">Radar</h3><p data-i18n="c8.p">Hardwired and always on — no cords hanging.</p><span class="cat-cta"><span data-i18n="cat.cta">See our work</span><svg><use href="#i-arrow"/></svg></span></div>
         </a>
-        <a class="cat" href="#contact" data-quote style="--i:8">
+        <a class="cat" href="#servicio/iluminacion" data-service="iluminacion" style="--i:8">
           <img src="img/lighting.jpg" alt="Car interior with red ambient lighting" loading="lazy" style="object-position:center 60%">
-          <div class="cat-body"><div class="cat-num">09</div><h3 data-i18n="c9.h">Lighting</h3><p data-i18n="c9.p">Ambient interior, underglow and wheel-well lights.</p><span class="cat-cta"><span data-i18n="cat.cta">Get a quote</span><svg><use href="#i-arrow"/></svg></span></div>
+          <div class="cat-body"><div class="cat-num">09</div><h3 data-i18n="c9.h">Lighting</h3><p data-i18n="c9.p">Ambient interior, underglow and wheel-well lights.</p><span class="cat-cta"><span data-i18n="cat.cta">See our work</span><svg><use href="#i-arrow"/></svg></span></div>
         </a>
       </div>
     </div>
@@ -800,6 +844,32 @@
   </div>
 </footer>
 
+<div class="sv" id="serviceView" role="dialog" aria-modal="true" aria-labelledby="svTitle" tabindex="-1" hidden>
+  <div class="sv-bar">
+    <div class="wrap sv-bar-inner">
+      <button type="button" class="sv-back" id="svBack"><svg><use href="#i-chev-l"/></svg><span data-i18n="sv.back">Services</span></button>
+      <button type="button" class="btn btn-dark sv-quote-top" id="svQuoteTop"><span data-i18n="sv.quote">Quote this service</span></button>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="sv-hero">
+      <img id="svImg" alt="">
+      <div class="sv-hero-body">
+        <span class="eyebrow" data-i18n="sv.eyebrow">Our work</span>
+        <h2 class="display" id="svTitle"></h2>
+        <p id="svDesc"></p>
+      </div>
+    </div>
+    <div class="sv-grid" id="svGrid"></div>
+    <div class="sv-empty" id="svEmpty" hidden>
+      <p data-i18n="sv.empty">We'll be adding examples of this service soon. In the meantime, get a free quote.</p>
+    </div>
+    <div class="sv-cta">
+      <button type="button" class="btn btn-accent" id="svQuote"><span data-i18n="sv.quote">Quote this service</span></button>
+    </div>
+  </div>
+</div>
+
 <dialog class="qf" id="quote" aria-labelledby="qfTitle">
   <div class="qf-head">
     <div class="qf-top">
@@ -878,7 +948,8 @@ const ES = {
   'c7.h': 'Cámaras de tablero', 'c7.p': 'Delantera y trasera, conectadas con cableado oculto.',
   'c8.h': 'Radar', 'c8.p': 'Conectados directo y siempre encendidos, sin cables colgando.',
   'c9.h': 'Iluminación', 'c9.p': 'Luces ambientales interiores, bajo el auto y en llantas.',
-  'cat.cta': 'Cotizar',
+  'cat.cta': 'Ver trabajos', 'sv.back': 'Servicios', 'sv.quote': 'Cotizar este servicio', 'sv.eyebrow': 'Nuestros trabajos',
+  'sv.empty': 'Pronto subiremos ejemplos de este servicio. Mientras tanto, cotiza sin compromiso.',
   'offer.eyebrow': 'Incluido con tu instalación', 'offer.title': 'Diagnóstico de audio y escaneo OBD',
   'offer.p': '¿No sabes qué necesita tu vehículo? Tráelo. Revisamos tu sistema de audio, escaneamos códigos y te decimos exactamente lo que encontramos. Si hacemos el trabajo, el diagnóstico va por nuestra cuenta.',
   'offer.l1': 'Revisión completa del audio', 'offer.l2': 'Diagnóstico con escáner OBD', 'offer.l3': 'Recomendaciones honestas, sin presión',
@@ -1207,7 +1278,7 @@ const siteContent = fetch('/api/gallery').then(r => r.ok ? r.json() : null).catc
   });
   $('qfClose').addEventListener('click', () => { keepTyped(); dlg.close(); });
   dlg.addEventListener('click', e => { if (e.target === dlg) { keepTyped(); dlg.close(); } });
-  dlg.addEventListener('close', () => { document.body.style.overflow = ''; });
+  dlg.addEventListener('close', () => { if (!document.getElementById('serviceView').classList.contains('open')) document.body.style.overflow = ''; });
 
   function open(service) {
     t = document.documentElement.lang === 'es' ? T.es : T.en;
@@ -1219,12 +1290,85 @@ const siteContent = fetch('/api/gallery').then(r => r.ok ? r.json() : null).catc
     document.body.style.overflow = 'hidden';
     go(step);
   }
+  window.openQuote = open;
   document.querySelectorAll('[data-quote]').forEach(el => el.addEventListener('click', e => {
     if (!window.HTMLDialogElement) return; // very old browsers keep the phone link
     e.preventDefault();
     const h3 = el.querySelector('h3');
     open(h3 ? h3.textContent.trim() : '');
   }));
+})();
+
+// ---- Service pages: each service card opens its own section with examples from /panel ----
+(function () {
+  const view = document.getElementById('serviceView');
+  const $ = id => document.getElementById(id);
+  const cards = [...document.querySelectorAll('.cat[data-service]')];
+  const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  let services = {}, current = null, pushed = false, lastFocus = null;
+  siteContent.then(d => { services = (d && d.services) || {}; if (current) fill(current); });
+
+  const card = id => cards.find(c => c.dataset.service === id);
+  function fill(id) {
+    const c = card(id), img = c.querySelector('img');
+    const name = c.querySelector('h3').textContent.trim();
+    $('svTitle').textContent = name;
+    $('svDesc').textContent = c.querySelector('p').textContent.trim();
+    $('svImg').src = img.getAttribute('src');
+    $('svImg').style.objectPosition = img.style.objectPosition || '';
+    const list = services[id] || [];
+    $('svGrid').innerHTML = list.map((e, j) => `
+      <button type="button" class="sv-item" data-j="${j}">
+        <figure><img src="${esc(e.url)}" alt="${esc(e.caption || name)}" loading="lazy">${e.caption ? `<figcaption>${esc(e.caption)}</figcaption>` : ''}</figure>
+      </button>`).join('');
+    $('svEmpty').hidden = list.length > 0;
+  }
+
+  function show(id) {
+    if (!card(id)) return;
+    current = id;
+    lastFocus = document.activeElement;
+    fill(id);
+    view.hidden = false;
+    view.scrollTop = 0;
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => { view.classList.add('open'); view.focus({ preventScroll: true }); });
+  }
+  function hide() {
+    if (!current) return;
+    current = null;
+    view.classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(() => { if (!current) view.hidden = true; }, 300);
+    if (lastFocus) lastFocus.focus({ preventScroll: true });
+  }
+  // Each service has its own address (#servicio/radios) so Back works and links can be shared
+  const fromHash = () => (location.hash.match(/^#servicio\/([\w-]+)$/) || [])[1];
+  cards.forEach(c => c.addEventListener('click', e => {
+    e.preventDefault();
+    history.pushState({ service: c.dataset.service }, '', '#servicio/' + c.dataset.service);
+    pushed = true;
+    show(c.dataset.service);
+  }));
+  function close() {
+    if (pushed) { pushed = false; history.back(); }
+    else { history.replaceState(null, '', '#services'); hide(); }
+  }
+  addEventListener('popstate', () => { const id = fromHash(); id ? show(id) : hide(); });
+  $('svBack').addEventListener('click', close);
+  view.addEventListener('keydown', e => { if (e.key === 'Escape' && !document.querySelector('dialog[open]')) close(); });
+  const quote = () => window.openQuote && openQuote($('svTitle').textContent);
+  $('svQuote').addEventListener('click', quote);
+  $('svQuoteTop').addEventListener('click', quote);
+  $('svGrid').addEventListener('click', e => {
+    const b = e.target.closest('.sv-item'); if (!b) return;
+    const list = services[current] || [];
+    openLightbox(list.map(x => ({ src: x.url, caption: x.caption })), $('svTitle').textContent, +b.dataset.j);
+  });
+  // Language toggle: refresh the texts that come from the card
+  document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', () => { if (current) fill(current); }));
+  const initial = fromHash();
+  if (initial) show(initial);
 })();
 
 // ---- "Built in our shop": covers and related photos come from /panel ----
@@ -1234,7 +1378,7 @@ const siteContent = fetch('/api/gallery').then(r => r.ok ? r.json() : null).catc
   const img = document.getElementById('lbImg');
   const thumbs = document.getElementById('lbThumbs');
   let items = cards.map(c => ({ cover: c.querySelector('img').getAttribute('src'), title: '', alt: c.querySelector('img').alt, photos: [] }));
-  let list = [], idx = 0, current = null;
+  let list = [], idx = 0, caps = [], title = '';
 
   const photoWord = n => document.documentElement.lang === 'es' ? (n === 1 ? 'foto' : 'fotos') : (n === 1 ? 'photo' : 'photos');
   function paintCards() {
@@ -1259,7 +1403,8 @@ const siteContent = fetch('/api/gallery').then(r => r.ok ? r.json() : null).catc
   function show(i) {
     idx = (i + list.length) % list.length;
     img.src = list[idx];
-    img.alt = current.title || current.alt || '';
+    img.alt = caps[idx] || title;
+    document.getElementById('lbTitle').textContent = caps[idx] || title;
     document.getElementById('lbCount').textContent = list.length > 1 ? `${idx + 1} / ${list.length}` : '';
     thumbs.querySelectorAll('button').forEach((b, j) => {
       b.setAttribute('aria-current', j === idx);
@@ -1267,17 +1412,23 @@ const siteContent = fetch('/api/gallery').then(r => r.ok ? r.json() : null).catc
     });
     [list[idx + 1], list[idx - 1]].forEach(u => { if (u) new Image().src = u; });
   }
-  function open(i) {
-    current = items[i];
-    list = [current.cover, ...current.photos];
-    document.getElementById('lbTitle').textContent = current.title || '';
+  // photos: [{ src, caption? }]
+  window.openLightbox = function (photos, heading = '', start = 0) {
+    list = photos.map(p => p.src);
+    caps = photos.map(p => p.caption || '');
+    title = heading;
     lb.classList.toggle('single', list.length === 1);
     thumbs.innerHTML = list.map((u, j) => `<button type="button" data-j="${j}" aria-label="${j + 1}"><img src="${u}" alt=""></button>`).join('');
     lb.showModal();
     document.body.style.overflow = 'hidden';
-    show(0);
+    show(start);
+  };
+  function open(i) {
+    const it = items[i];
+    openLightbox([it.cover, ...it.photos].map(src => ({ src })), it.title || '');
   }
-  lb.addEventListener('close', () => { document.body.style.overflow = ''; img.removeAttribute('src'); });
+  // The service page may sit underneath: keep the page locked while it is open
+  lb.addEventListener('close', () => { if (!document.getElementById('serviceView').classList.contains('open')) document.body.style.overflow = ''; img.removeAttribute('src'); });
   cards.forEach((c, i) => c.addEventListener('click', () => open(i)));
   document.getElementById('lbClose').addEventListener('click', () => lb.close());
   document.getElementById('lbPrev').addEventListener('click', () => show(idx - 1));

@@ -1,8 +1,9 @@
 import { isAuthed, json } from './_lib/auth.js';
-import { readGallery, writeGallery, isOwnPhoto, DEFAULT_GALLERY } from './_lib/store.js';
+import { readGallery, writeGallery, isOwnPhoto, DEFAULT_GALLERY, SERVICE_IDS } from './_lib/store.js';
 
 const MAX_PHOTOS = 40;
 const MAX_CLIENTS = 30;
+const MAX_EXAMPLES = 60;
 
 export async function GET(request) {
   try {
@@ -51,8 +52,17 @@ export async function PUT(request) {
     clients.push({ vehicle, work, before: c.before, after: c.after });
   }
 
+  const rawServices = body.services && typeof body.services === 'object' ? body.services : {};
+  const services = {};
+  for (const id of SERVICE_IDS) {
+    const list = Array.isArray(rawServices[id]) ? rawServices[id] : [];
+    if (list.length > MAX_EXAMPLES) return json({ error: `Máximo ${MAX_EXAMPLES} ejemplos por servicio` }, 400);
+    if (!list.every(e => e && isOwnPhoto(e.url))) return json({ error: 'Hay una foto inválida en los servicios' }, 400);
+    if (list.length) services[id] = list.map(e => ({ url: e.url, caption: text(e.caption, 100) }));
+  }
+
   try {
-    return json(await writeGallery({ items, clients }));
+    return json(await writeGallery({ items, clients, services }));
   } catch (e) {
     console.error(e);
     return json({ error: 'No se pudo guardar. Intenta de nuevo.' }, 500);

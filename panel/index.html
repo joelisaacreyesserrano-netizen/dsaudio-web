@@ -159,6 +159,17 @@
     .add-client { width: 100%; height: 64px; margin: 20px 0 140px; border: 1.5px dashed #C9C6BE; border-radius: var(--radius); background: transparent; cursor: pointer; font-weight: 600; color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 8px; }
     .add-client:hover { border-color: var(--accent); color: var(--accent-ink); background: #FFF4EF; }
     .add-client svg { width: 18px; height: 18px; }
+    /* ===== SERVICES ===== */
+    .services { display: grid; gap: 20px; padding: 24px 0 140px; }
+    .service { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+    .service-head { display: flex; align-items: center; gap: 14px; }
+    .service-head img { width: 56px; height: 56px; border-radius: 12px; object-fit: cover; flex-shrink: 0; }
+    .service-head h2 { font-size: 1.05rem; font-weight: 600; }
+    .examples { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-top: 16px; }
+    .ex { display: flex; flex-direction: column; gap: 6px; }
+    .ex .ph { aspect-ratio: 4 / 5; }
+    .ex .cap { height: 38px; padding: 0 10px; font-size: 0.82rem; border-radius: 10px; }
+    .examples .drop { aspect-ratio: 4 / 5; }
     .empty { text-align: center; color: var(--muted); padding: 40px 16px; background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius); }
 
     .loading-page { min-height: 60vh; display: grid; place-items: center; color: var(--muted); }
@@ -230,6 +241,7 @@
     <div class="tabs" role="tablist">
       <button type="button" role="tab" data-tab="taller" aria-selected="true">Hecho en nuestro taller</button>
       <button type="button" role="tab" data-tab="clientes" aria-selected="false">Clientes satisfechos</button>
+      <button type="button" role="tab" data-tab="servicios" aria-selected="false">Servicios</button>
     </div>
     <div class="loading-page" id="loadingJobs">Cargando…</div>
 
@@ -248,6 +260,14 @@
       </div>
       <div class="clients" id="clients"></div>
       <button type="button" class="add-client" id="addClient"><svg><use href="#i-plus"/></svg>Agregar cliente</button>
+    </section>
+
+    <section id="tab-servicios" hidden>
+      <div class="intro">
+        <h1>Servicios</h1>
+        <p>Cuando un visitante toca un servicio en "Nuestros servicios", ve los ejemplos que subas aquí. Agrega fotos de trabajos de cada tipo y, si quieres, una descripción corta (ej. "Ford F-150 · Pantalla Kenwood de 10 pulgadas").</p>
+      </div>
+      <div class="services" id="services"></div>
     </section>
   </main>
 
@@ -322,7 +342,7 @@ async function showApp() {
     savedJSON = JSON.stringify(gallery);
     $('#loadingJobs').hidden = true;
     render();
-    showTab(location.hash === '#clientes' ? 'clientes' : 'taller');
+    showTab(['#clientes', '#servicios'].includes(location.hash) ? location.hash.slice(1) : 'taller');
   } catch (e) {
     $('#loadingJobs').textContent = 'No se pudo cargar la galería. Recarga la página.';
   }
@@ -360,7 +380,8 @@ function showTab(name) {
   document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === name));
   $('#tab-taller').hidden = name !== 'taller';
   $('#tab-clientes').hidden = name !== 'clientes';
-  history.replaceState(null, '', name === 'clientes' ? '#clientes' : location.pathname);
+  $('#tab-servicios').hidden = name !== 'servicios';
+  history.replaceState(null, '', name === 'taller' ? location.pathname : '#' + name);
 }
 document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
 
@@ -438,6 +459,100 @@ $('#clients').addEventListener('keydown', e => {
   if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('label[tabindex]')) { e.preventDefault(); e.target.querySelector('input').click(); }
 });
 
+// ---- service examples ----
+const SERVICES = [
+  ['radios', 'Radios', 'screen.jpg'],
+  ['amplificadores', 'Amplificadores de 4 y 5 canales', 'amplifier.jpg'],
+  ['amplificadores-sub', 'Amplificadores para sub', 'sub-amp.jpg'],
+  ['bocinas', 'Bocinas', 'speakers-door.jpg'],
+  ['aislamiento', 'Aislamiento acústico', 'sound-damping.jpg'],
+  ['camaras-reversa', 'Cámaras de reversa', 'backup-camera.jpg'],
+  ['camaras-tablero', 'Cámaras de tablero', 'dash-cam.jpg'],
+  ['radar', 'Radar', 'radar-detector.jpg'],
+  ['iluminacion', 'Iluminación', 'lighting.jpg'],
+];
+const MAX_EXAMPLES = 60;
+const pendingEx = {}; // uploads in progress per service, for the loading tiles
+
+function renderServices() {
+  $('#services').innerHTML = SERVICES.map(([id, name, img]) => {
+    const list = gallery.services[id] || [];
+    return `
+    <section class="service" data-s="${id}">
+      <div class="service-head">
+        <img src="/img/${img}" alt="">
+        <div><h2>${name}</h2><p class="hint">${list.length} ejemplo${list.length === 1 ? '' : 's'}</p></div>
+      </div>
+      <div class="examples">
+        ${list.map((e, j) => `
+          <div class="ex">
+            <div class="ph">
+              <img src="${esc(e.url)}" alt="" loading="lazy">
+              <div class="tools">
+                <button type="button" data-sact="left" data-j="${j}" aria-label="Mover a la izquierda" ${j === 0 ? 'disabled' : ''}>${icon('i-left')}</button>
+                <button type="button" class="del" data-sact="del" data-j="${j}" aria-label="Eliminar foto">${icon('i-x')}</button>
+                <button type="button" data-sact="right" data-j="${j}" aria-label="Mover a la derecha" ${j === list.length - 1 ? 'disabled' : ''}>${icon('i-right')}</button>
+              </div>
+            </div>
+            <input class="input cap" data-j="${j}" maxlength="100" placeholder="Descripción (opcional)" value="${esc(e.caption || '')}">
+          </div>`).join('')}
+        ${'<div class="ex"><div class="ph loading"></div></div>'.repeat(pendingEx[id] || 0)}
+        <label class="drop" tabindex="0">
+          <span>${icon('i-plus')}Agregar ejemplos</span>
+          <input class="file" type="file" accept="image/*" multiple>
+        </label>
+      </div>
+    </section>`;
+  }).join('');
+}
+
+async function addExamples(id, files) {
+  files = [...files].filter(f => f.type.startsWith('image/'));
+  if (!files.length) return;
+  const list = gallery.services[id] = gallery.services[id] || [];
+  const room = MAX_EXAMPLES - list.length - (pendingEx[id] || 0);
+  if (room <= 0) return toast(`Máximo ${MAX_EXAMPLES} ejemplos por servicio`, 'bad');
+  files = files.slice(0, room);
+  pendingEx[id] = (pendingEx[id] || 0) + files.length; uploading += files.length; render();
+  let failed = 0;
+  for (const f of files) {
+    try { list.push({ url: await upload(f), caption: '' }); }
+    catch (e) { failed++; toast(e.message, 'bad'); }
+    pendingEx[id]--; uploading--; render();
+  }
+  if (!failed) toast(files.length === 1 ? 'Ejemplo agregado. No olvides guardar.' : `${files.length} ejemplos agregados. No olvides guardar.`);
+}
+
+$('#services').addEventListener('change', e => {
+  if (e.target.type !== 'file') return;
+  addExamples(e.target.closest('.service').dataset.s, e.target.files);
+  e.target.value = '';
+});
+$('#services').addEventListener('input', e => {
+  if (!e.target.classList.contains('cap')) return;
+  gallery.services[e.target.closest('.service').dataset.s][+e.target.dataset.j].caption = e.target.value;
+  updateSavebar();
+});
+$('#services').addEventListener('click', e => {
+  const b = e.target.closest('button[data-sact]'); if (!b) return;
+  const id = b.closest('.service').dataset.s, list = gallery.services[id], j = +b.dataset.j;
+  if (b.dataset.sact === 'del') { if (!confirm('¿Eliminar este ejemplo?')) return; list.splice(j, 1); }
+  if (b.dataset.sact === 'left' && j > 0) [list[j - 1], list[j]] = [list[j], list[j - 1]];
+  if (b.dataset.sact === 'right' && j < list.length - 1) [list[j + 1], list[j]] = [list[j], list[j + 1]];
+  if (!list.length) delete gallery.services[id];
+  render();
+});
+$('#services').addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('label[tabindex]')) { e.preventDefault(); e.target.querySelector('input').click(); }
+});
+$('#services').addEventListener('dragover', e => { const d = e.target.closest('.drop'); if (d) { e.preventDefault(); d.classList.add('over'); } });
+$('#services').addEventListener('dragleave', e => { const d = e.target.closest('.drop'); if (d) d.classList.remove('over'); });
+$('#services').addEventListener('drop', e => {
+  const d = e.target.closest('.drop'); if (!d) return;
+  e.preventDefault(); d.classList.remove('over');
+  addExamples(d.closest('.service').dataset.s, e.dataTransfer.files);
+});
+
 // A customer must be complete before saving
 function firstIncomplete() {
   return gallery.clients.findIndex(c => !c.vehicle.trim() || !c.work.trim() || !c.before || !c.after);
@@ -445,6 +560,7 @@ function firstIncomplete() {
 
 function render() {
   renderClients();
+  renderServices();
   $('#jobs').innerHTML = gallery.items.map((it, i) => `
     <section class="job" data-i="${i}">
       <div class="job-cover-col">
