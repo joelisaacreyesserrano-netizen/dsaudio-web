@@ -818,7 +818,7 @@
           <span><small>Instagram</small><strong>@audio__ds</strong></span>
           <svg class="arrow"><use href="#i-arrow"/></svg>
         </a>
-        <a class="contact-card" href="tel:+15209794376">
+        <a class="contact-card" href="tel:+15209794376" data-quote="offer.title">
           <span class="ic"><svg style="color:var(--accent)"><use href="#i-scan"/></svg></span>
           <span><small data-i18n="ct.free">Included with install · $40 alone</small><strong data-i18n="ct.diag">Book a diagnostic</strong></span>
           <svg class="arrow"><use href="#i-arrow"/></svg>
@@ -1294,8 +1294,10 @@ const siteContent = fetch('/api/gallery').then(r => r.ok ? r.json() : null).catc
   document.querySelectorAll('[data-quote]').forEach(el => el.addEventListener('click', e => {
     if (!window.HTMLDialogElement) return; // very old browsers keep the phone link
     e.preventDefault();
+    // data-quote="<i18n key>" names the service from that (already translated) text
+    const named = el.dataset.quote && document.querySelector(`[data-i18n="${el.dataset.quote}"]`);
     const h3 = el.querySelector('h3');
-    open(h3 ? h3.textContent.trim() : '');
+    open(named ? named.textContent.trim() : h3 ? h3.textContent.trim() : '');
   }));
 })();
 
