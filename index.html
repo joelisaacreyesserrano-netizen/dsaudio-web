@@ -428,6 +428,10 @@
     .qf-skipbtn:hover { color: var(--ink); }
     .qf-skipbtn[hidden] { display: none; }
     textarea.qf-input.qf-text { height: auto; min-height: 120px; padding: 14px 16px; line-height: 1.5; resize: vertical; }
+    .qf-contact-label { font-size: 0.85rem; font-weight: 600; margin-top: 18px; }
+    .qf-contact { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .qf-contact .qf-input { margin-top: 8px; height: 50px; font-size: 1rem; }
+    @media (max-width: 420px) { .qf-contact { grid-template-columns: 1fr; } .qf-contact .qf-input + .qf-input { margin-top: 0; } }
     .qf-sum .qf-skip { color: var(--muted); font-style: normal; font-size: 0.88rem; }
     .qf-sum .qf-work { font-weight: 500; max-width: 70%; white-space: pre-line; }
     .qf-foot .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
@@ -1098,10 +1102,11 @@ const siteContent = fetch('/api/gallery').then(r => r.ok ? r.json() : null).catc
       tap: 'Tap to take or choose a photo', change: 'Change', uploading: 'Uploading…', uploaded: 'Ready', failed: 'Upload failed — try again or skip',
       sumTitle: 'All set! Send it to us on WhatsApp', sumHint: 'We will reply with your quote. You can add anything else in the chat.',
       vehicle: 'Vehicle', dashS: 'Dashboard', doorS: 'Door label', workS: 'Work', skipped: 'Skipped',
+      contact: 'So we can send you the quote (optional)', namePh: 'Your name', phonePh: 'Your phone',
       back: 'Back', next: 'Next', skip: 'Skip', retry: 'Retake photo', send: 'Send on WhatsApp', wait: 'Uploading photos…',
       required: 'Answer or tap “Skip” to continue.', photoRequired: 'Add the photo or tap “Skip” to continue.',
       msg: {
-        hello: "Hi 12 Voltec! I'd like a quote.", service: 'Service', work: 'Work I want done',
+        hello: "Hi 12 Voltec! I'd like a quote.", name: 'Name', service: 'Service', work: 'Work I want done',
         vehicle: 'Vehicle', dash: 'Dashboard photo', door: "Driver's door label",
       },
     },
@@ -1116,10 +1121,11 @@ const siteContent = fetch('/api/gallery').then(r => r.ok ? r.json() : null).catc
       tap: 'Toca para tomar o elegir una foto', change: 'Cambiar', uploading: 'Subiendo…', uploaded: 'Lista', failed: 'No se pudo subir — intenta de nuevo u omite',
       sumTitle: '¡Listo! Envíanoslo por WhatsApp', sumHint: 'Te responderemos con tu cotización. Puedes agregar cualquier detalle en el chat.',
       vehicle: 'Vehículo', dashS: 'Tablero', doorS: 'Etiqueta de puerta', workS: 'Trabajo', skipped: 'Omitido',
+      contact: 'Para enviarte la cotización (opcional)', namePh: 'Tu nombre', phonePh: 'Tu teléfono',
       back: 'Atrás', next: 'Siguiente', skip: 'Omitir', retry: 'Volver a tomar la foto', send: 'Enviar por WhatsApp', wait: 'Subiendo fotos…',
       required: 'Responde o toca “Omitir” para continuar.', photoRequired: 'Agrega la foto o toca “Omitir” para continuar.',
       msg: {
-        hello: '¡Hola 12 Voltec! Quiero una cotización.', service: 'Servicio', work: 'Trabajo que me gustaría',
+        hello: '¡Hola 12 Voltec! Quiero una cotización.', name: 'Nombre', service: 'Servicio', work: 'Trabajo que me gustaría',
         vehicle: 'Vehículo', dash: 'Foto del tablero', door: 'Etiqueta de la puerta del conductor',
       },
     },
@@ -1181,7 +1187,12 @@ const siteContent = fetch('/api/gallery').then(r => r.ok ? r.json() : null).catc
       ${row(t.dashS, img('dash'))}
       ${row(t.doorS, img('door'))}
       ${row(t.workS, data.work && `<strong class="qf-work">${esc(data.work)}</strong>`)}
-    </ul>`;
+    </ul>
+    <p class="qf-contact-label">${t.contact}</p>
+    <div class="qf-contact">
+      <input class="qf-input" data-k="name" autocomplete="name" autocapitalize="words" maxlength="80" placeholder="${t.namePh}" value="${esc(data.name || '')}">
+      <input class="qf-input" data-k="phone" type="tel" autocomplete="tel" maxlength="30" placeholder="${t.phonePh}" value="${esc(data.phone || '')}">
+    </div>`;
   }
 
   function render() {
@@ -1247,6 +1258,7 @@ const siteContent = fetch('/api/gallery').then(r => r.ok ? r.json() : null).catc
 
   function message() {
     const m = t.msg, lines = [m.hello, ''];
+    if (data.name) lines.push(`${m.name}: ${data.name}`);
     if (data.service) lines.push(`${m.service}: ${data.service}`);
     if (data.work) lines.push(`${m.work}: ${data.work}`);
     const vehicle = [data.year, data.make, data.model].filter(Boolean).join(' ');
@@ -1261,6 +1273,11 @@ const siteContent = fetch('/api/gallery').then(r => r.ok ? r.json() : null).catc
     if (step < STEPS.length) { if (valid()) go(step + 1); return; }
     const failed = taken().find(k => photos[k].error);
     if (failed) return go(STEPS.indexOf(failed));
+    // Also file it in /panel → Cotizaciones (fire-and-forget; WhatsApp must open right away)
+    fetch('/api/quotes', {
+      method: 'POST', keepalive: true, headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ ...data, lang: document.documentElement.lang, dash: photos.dash?.url, door: photos.door?.url }),
+    }).catch(() => {});
     window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message())}`, '_blank', 'noopener');
     step = 0; data = {}; photos = {};
     dlg.close();
@@ -1272,6 +1289,8 @@ const siteContent = fetch('/api/gallery').then(r => r.ok ? r.json() : null).catc
     go(step + 1);
   });
   $('qfBack').addEventListener('click', () => { keepTyped(); go(step - 1); });
+  // Name/phone on the summary are kept as typed (the summary redraws when a photo finishes)
+  $('qfField').addEventListener('input', e => { const k = e.target.dataset.k; if (k) data[k] = e.target.value.trim(); });
   $('qfForm').addEventListener('submit', e => { e.preventDefault(); $('qfNext').click(); });
   $('qfForm').addEventListener('keydown', e => {
     if (e.key === 'Enter' && e.target.id === 'qfIn' && e.target.tagName !== 'TEXTAREA') { e.preventDefault(); $('qfNext').click(); }
