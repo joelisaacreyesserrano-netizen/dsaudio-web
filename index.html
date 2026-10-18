@@ -1273,11 +1273,12 @@ const siteContent = fetch('/api/gallery').then(r => r.ok ? r.json() : null).catc
     if (step < STEPS.length) { if (valid()) go(step + 1); return; }
     const failed = taken().find(k => photos[k].error);
     if (failed) return go(STEPS.indexOf(failed));
-    // Also file it in /panel → Cotizaciones (fire-and-forget; WhatsApp must open right away)
-    fetch('/api/quotes', {
-      method: 'POST', keepalive: true, headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ ...data, lang: document.documentElement.lang, dash: photos.dash?.url, door: photos.door?.url }),
-    }).catch(() => {});
+    // Also file it in /panel → Cotizaciones. sendBeacon is delivered even when the
+    // phone switches straight to the WhatsApp app; fetch+keepalive is the fallback.
+    const record = JSON.stringify({ ...data, lang: document.documentElement.lang, dash: photos.dash?.url, door: photos.door?.url });
+    let queued = false;
+    try { queued = navigator.sendBeacon('/api/quotes', new Blob([record], { type: 'text/plain' })); } catch {}
+    if (!queued) fetch('/api/quotes', { method: 'POST', keepalive: true, headers: { 'content-type': 'text/plain' }, body: record }).catch(() => {});
     window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message())}`, '_blank', 'noopener');
     step = 0; data = {}; photos = {};
     dlg.close();
