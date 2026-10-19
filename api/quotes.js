@@ -16,8 +16,8 @@ const MAX_ITEMS = 30;
 export const DEFAULT_SETTINGS = {
   business: '12 Voltec',
   phone: '+1 (520) 979-4376',
-  email: 'DsAudio17@gmail.com',
-  instagram: 'audio_ds',
+  email: '12voltec@gmail.com',
+  instagram: '@12voltec',
   facebook: 'DsAudio',
   validDays: 15,
   taxRate: 8,
