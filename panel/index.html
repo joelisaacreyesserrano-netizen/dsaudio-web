@@ -1012,7 +1012,7 @@ function renderQuoteDetail() {
       </aside>
       <section class="qd-est">
         <h2>Cotización</h2>
-        <div class="field"><label>Trabajo (Job)</label><input class="input" data-qe="job" maxlength="120" value="${esc(e.job)}" placeholder="Ej. 5 Ch - LC7i - Speakers F/R"></div>
+        <div class="field"><label>Servicios (Services)</label><input class="input" data-qe="job" maxlength="120" value="${esc(e.job)}" placeholder="Ej. 5 Ch - LC7i - Speakers F/R"></div>
         <div class="qtable">
           <div class="qrow qhead"><span>Concepto (Labor / Parts)</span><span>Pieza</span><span>Cant.</span><span>Precio</span><span>Total</span><span></span></div>
           ${e.items.map((it, i) => `
@@ -1261,9 +1261,9 @@ async function downloadEstimatePdf(q, st) {
   line('Customer:', q.name, 333);
   line('Phone:', q.phone, 366);
   line('Car:', [q.make, q.model].filter(Boolean).join(' ') + (q.year ? ` (${q.year})` : ''), 399);
-  // Job can be long: wrap to two lines inside the table width
-  font('bold', 13); txt('Job:', 103, 466);
-  const jx = X(103) + doc.getTextWidth('Job: ');
+  // Services can be long: wrap to two lines inside the table width
+  font('bold', 13); txt('Services:', 103, 466);
+  const jx = X(103) + doc.getTextWidth('Services: ');
   font('normal', 13);
   const jobLines = doc.splitTextToSize(e.job || '', X(857) - jx).slice(0, 2);
   jobLines.forEach((l, i) => doc.text(l, jx, X(466 + i * 24)));
