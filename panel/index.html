@@ -172,6 +172,54 @@
     .ex .ph { aspect-ratio: 4 / 5; }
     .ex .cap { height: 38px; padding: 0 10px; font-size: 0.82rem; border-radius: 10px; }
     .examples .drop { aspect-ratio: 4 / 5; }
+    /* ===== FOLDERS (taller + servicios) ===== */
+    .folders { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
+    .folder { position: relative; min-width: 0; display: flex; flex-direction: column; gap: 10px; width: 100%; padding: 10px 10px 14px; text-align: left; cursor: pointer; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); transition: border-color 0.2s, transform 0.2s; }
+    .folder:hover { border-color: var(--ink); transform: translateY(-2px); }
+    .folder.missing { border-color: var(--danger); }
+    .folder-thumb { position: relative; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden; background: #e9e7e1; display: grid; place-items: center; color: #C9C6BE; }
+    .folder-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .folder-thumb > svg { width: 30px; height: 30px; }
+    .folder-strip { position: absolute; right: 8px; bottom: 8px; display: flex; gap: 4px; }
+    .folder-strip img { position: static; width: 34px; height: 34px; border-radius: 8px; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+    .folder-name { display: flex; align-items: center; gap: 8px; padding: 0 4px; font-weight: 600; font-size: 0.95rem; min-width: 0; }
+    .folder-name svg { flex: none; width: 18px; height: 18px; color: var(--accent); }
+    .folder-name span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .folder-meta { padding: 0 4px; color: var(--muted); font-size: 0.82rem; margin-top: -6px; }
+    .folder-bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; }
+    .folder-path { color: var(--muted); font-size: 0.9rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .folder-path strong { color: var(--ink); }
+    /* ===== SEARCH (iOS Files style) ===== */
+    .search { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+    .search-field { flex: 1; position: relative; display: flex; align-items: center; height: 44px; margin: 0; padding: 0 10px; border-radius: 12px; background: rgba(118,118,128,0.12); cursor: text; font-weight: 400; }
+    .search-field > svg { flex: none; width: 18px; height: 18px; color: #8E8E93; }
+    .search-field input { flex: 1; min-width: 0; height: 100%; padding: 0 8px; border: 0; background: transparent; outline: none; font-size: 1rem; }
+    .search-field input::placeholder { color: #8E8E93; }
+    .search-field input::-webkit-search-cancel-button { display: none; }
+    .search-clear { flex: none; width: 20px; height: 20px; border: 0; border-radius: 50%; background: #AEAEB2; color: #fff; display: grid; place-items: center; cursor: pointer; }
+    .search-clear svg { width: 11px; height: 11px; }
+    .search-cancel { border: 0; background: none; padding: 0; cursor: pointer; color: var(--accent-ink); font-size: 1rem; }
+    .search kbd { font: 600 0.72rem var(--body); color: #8E8E93; border: 1px solid #C7C7CC; border-radius: 6px; padding: 1px 6px; }
+    .searching main > section, .searching #loadingJobs { display: none !important; }
+    #searchResults { padding: 8px 0 140px; }
+    .sr-group { margin-top: 22px; }
+    .sr-group h3 { font-size: 0.78rem; font-weight: 600; color: #8E8E93; text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 8px 16px; }
+    .sr-list { background: var(--surface); border-radius: 14px; overflow: hidden; border: 1px solid var(--line); }
+    .sr-row { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; padding: 8px 14px; border: 0; background: none; text-align: left; cursor: pointer; position: relative; }
+    .sr-row + .sr-row::before { content: ''; position: absolute; top: 0; left: 70px; right: 0; border-top: 1px solid var(--line); }
+    .sr-row:hover, .sr-row:focus-visible { background: #F2F2F7; outline: none; }
+    .sr-thumb { flex: none; width: 44px; height: 44px; border-radius: 9px; overflow: hidden; background: #E5E5EA; display: grid; place-items: center; color: var(--accent); }
+    .sr-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .sr-thumb svg { width: 24px; height: 24px; }
+    .sr-text { flex: 1; min-width: 0; display: grid; }
+    .sr-text strong { font-weight: 500; font-size: 0.98rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sr-text span { color: #8E8E93; font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sr-text mark { background: #FFE8DE; color: inherit; border-radius: 3px; }
+    .sr-row > svg { flex: none; width: 14px; height: 14px; color: #C7C7CC; }
+    .sr-empty { text-align: center; color: #8E8E93; padding: 60px 16px; }
+    .sr-empty strong { display: block; color: var(--ink); font-size: 1.1rem; margin-bottom: 4px; }
+    .flash { animation: flash 1.6s ease; }
+    @keyframes flash { 0%, 60% { box-shadow: 0 0 0 3px var(--accent); } 100% { box-shadow: 0 0 0 3px transparent; } }
     .empty { text-align: center; color: var(--muted); padding: 40px 16px; background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius); }
 
     /* ===== QUOTES ===== */
@@ -288,6 +336,10 @@
       .client-grid .client-text { grid-column: 1 / -1; }
       .service { padding: 16px; }
       .svc-grid { grid-template-columns: 1fr; gap: 12px; }
+      .folders { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .search kbd { display: none; }
+      .folder { padding: 8px 8px 12px; }
+      .folder-strip img { width: 26px; height: 26px; }
       .svc-cover { max-width: 260px; }
       .svc-fields { grid-template-columns: 1fr; }
       .savebar-inner { flex-direction: column; align-items: stretch; text-align: center; }
@@ -306,6 +358,10 @@
   <symbol id="i-out" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"/></symbol>
   <symbol id="i-up" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M5 9l7 7 7-7"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="m15.5 15.5 4.5 4.5"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.8" fill="none" stroke="currentColor" stroke-width="1.8"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M4.5 20c1.2-3.6 4-5.4 7.5-5.4s6.3 1.8 7.5 5.4"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M6.5 3.5h7l4.5 4.5v12.5h-11.5zM13.5 3.5V8H18M9.5 12.5h5M9.5 16h5"/></symbol>
   <symbol id="i-img" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="10" r="1.6" fill="currentColor"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="m4 17 5-5 4 4 3-3 4 4"/></symbol>
 </svg>
 
@@ -347,6 +403,16 @@
       <button type="button" role="tab" data-tab="clientes" aria-selected="false">Clientes satisfechos</button>
       <button type="button" role="tab" data-tab="servicios" aria-selected="false">Servicios</button>
     </div>
+    <div class="search" role="search">
+      <label class="search-field">
+        <svg><use href="#i-search"/></svg>
+        <input type="search" id="search" placeholder="Buscar" autocomplete="off" spellcheck="false" aria-label="Buscar en el panel">
+        <kbd id="searchKbd">/</kbd>
+        <button type="button" class="search-clear" id="searchClear" aria-label="Borrar búsqueda" hidden><svg><use href="#i-x"/></svg></button>
+      </label>
+      <button type="button" class="search-cancel" id="searchCancel" hidden>Cancelar</button>
+    </div>
+    <div id="searchResults" hidden></div>
     <div class="loading-page" id="loadingJobs">Cargando…</div>
 
     <section id="tab-cotizaciones" hidden>
@@ -375,7 +441,7 @@
     <section id="tab-taller">
       <div class="intro">
         <h1>Hecho en nuestro taller</h1>
-        <p>Estos son los 4 trabajos que se ven en la página. Cambia la portada de cada uno y agrega las fotos relacionadas: cuando un visitante toque la portada, verá todas sus fotos.</p>
+        <p>Estos son los 4 trabajos que se ven en la página. Cada trabajo es una carpeta: ábrela para cambiar su portada y agregar las fotos relacionadas. Cuando un visitante toque la portada, verá todas sus fotos.</p>
       </div>
       <div class="jobs" id="jobs"></div>
     </section>
@@ -392,7 +458,7 @@
     <section id="tab-servicios" hidden>
       <div class="intro">
         <h1>Servicios</h1>
-        <p>Estas son las tarjetas de "Nuestros servicios" en la página. Cambia la portada, el título y la descripción de cada una, cambia el orden, elimina o agrega servicios. Al tocar un servicio, los visitantes ven los ejemplos que subas aquí.</p>
+        <p>Estas son las tarjetas de "Nuestros servicios" en la página. Cambia la portada, el título y la descripción de cada una, cambia el orden, elimina o agrega servicios. Cada servicio es una carpeta: ábrela para editarlo y subir sus ejemplos, que los visitantes ven al tocar el servicio.</p>
       </div>
       <div class="services" id="services"></div>
       <button type="button" class="add-client" id="addService"><svg><use href="#i-plus"/></svg>Agregar servicio</button>
@@ -544,7 +610,11 @@ function showTab(name) {
   $('#tab-servicios').hidden = name !== 'servicios';
   history.replaceState(null, '', name === 'cotizaciones' ? location.pathname : '#' + name);
 }
-document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => {
+  // Tapping the tab you're on goes back to its folders
+  if (b.getAttribute('aria-selected') === 'true' && openF[b.dataset.tab] != null) openFolder(b.dataset.tab, null);
+  showTab(b.dataset.tab);
+}));
 
 // ---- satisfied customers ----
 const slot = (c, i, kind, label) => `
@@ -620,6 +690,116 @@ $('#clients').addEventListener('keydown', e => {
   if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('label[tabindex]')) { e.preventDefault(); e.target.querySelector('input').click(); }
 });
 
+// ---- folders: taller and servicios show a grid of folders; opening one edits only that item ----
+const openF = { taller: null, servicios: null };
+function folderGrid(list) {
+  return `<div class="folders">${list.map((f, i) => `
+    <button type="button" class="folder${f.missing ? ' missing' : ''}" data-open="${i}">
+      <span class="folder-thumb">
+        ${f.cover ? `<img src="${esc(f.cover)}" alt="" loading="lazy">` : icon('i-img')}
+        ${f.photos.length ? `<span class="folder-strip">${f.photos.slice(0, 3).map(u => `<img src="${esc(u)}" alt="" loading="lazy">`).join('')}</span>` : ''}
+      </span>
+      <span class="folder-name">${icon('i-folder')}<span>${esc(f.name)}</span></span>
+      <span class="folder-meta">${f.photos.length} ${f.photos.length === 1 ? f.unit : f.unit + 's'}${f.pending ? ` · subiendo ${f.pending}…` : ''}</span>
+    </button>`).join('')}</div>`;
+}
+const folderBar = (section, name) => `
+  <div class="folder-bar">
+    <button type="button" class="btn btn-sm" data-close>${icon('i-left')} Todas las carpetas</button>
+    <span class="folder-path">${section} / <strong>${esc(name)}</strong></span>
+  </div>`;
+function openFolder(tab, i) {
+  openF[tab] = i; render(); showTab(tab);
+  $('#tab-' + tab).scrollIntoView({ block: 'start' });
+}
+['jobs', 'services'].forEach(id => $('#' + id).addEventListener('click', e => {
+  const tab = id === 'jobs' ? 'taller' : 'servicios';
+  const o = e.target.closest('[data-open]');
+  if (o) openFolder(tab, +o.dataset.open);
+  if (e.target.closest('[data-close]')) openFolder(tab, null);
+}));
+
+// ---- search: one box that finds folders, photos, customers and quotes across the whole panel ----
+const norm = t => String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+function highlight(text, terms) {
+  const t = String(text || ''), n = norm(t); // NFD-stripped text keeps the same length for Spanish accents
+  const marks = new Array(t.length).fill(false);
+  terms.forEach(w => { let k = n.indexOf(w); while (k !== -1 && w) { marks.fill(true, k, k + w.length); k = n.indexOf(w, k + w.length); } });
+  let out = '', on = false;
+  for (let k = 0; k < t.length; k++) {
+    if (marks[k] !== on) { out += marks[k] ? '<mark>' : '</mark>'; on = marks[k]; }
+    out += esc(t[k]);
+  }
+  return out + (on ? '</mark>' : '');
+}
+function searchIndex() {
+  const rows = [];
+  if (gallery) {
+    gallery.items.forEach((it, i) => rows.push({ group: 'Hecho en nuestro taller', title: it.title || `Trabajo ${i + 1}`,
+      sub: `Carpeta · ${it.photos.length} foto${it.photos.length === 1 ? '' : 's'}`, thumb: src(it.cover), text: [it.title, `trabajo ${i + 1}`, 'taller'],
+      go: () => openFolder('taller', i) }));
+    gallery.services.forEach((sv, i) => {
+      const name = sv.title.es || `Servicio ${i + 1}`;
+      rows.push({ group: 'Servicios', title: name, sub: `Carpeta · ${sv.examples.length} ejemplo${sv.examples.length === 1 ? '' : 's'}${sv.desc.es ? ' · ' + sv.desc.es : ''}`,
+        thumb: sv.cover && src(sv.cover), text: [sv.title.es, sv.title.en, sv.desc.es, sv.desc.en, 'servicio'], go: () => openFolder('servicios', i) });
+      sv.examples.forEach((ex, j) => ex.caption && rows.push({ group: 'Fotos', title: ex.caption, sub: `Servicios / ${name}`, thumb: ex.url,
+        text: [ex.caption, sv.title.es, sv.title.en], go: () => { openFolder('servicios', i); flash(document.querySelectorAll('#services .ex')[j]); } }));
+    });
+    gallery.clients.forEach((c, i) => rows.push({ group: 'Clientes satisfechos', title: c.vehicle || `Cliente ${i + 1}`, sub: c.work || 'Sin descripción',
+      thumb: c.after || c.before, icon: 'i-user', text: [c.vehicle, c.work, `cliente ${i + 1}`],
+      go: () => { showTab('clientes'); flash(document.querySelector(`.client[data-c="${i}"]`)); } }));
+  }
+  Q.list.forEach(q => rows.push({ group: 'Cotizaciones', title: `${q.name || 'Cliente sin nombre'}${carOf(q) ? ' · ' + carOf(q) : ''}`,
+    sub: `${STATUS[q.status]} · ${fmtDate(q.createdAt)}${q.service ? ' · ' + q.service : ''}${q.work ? ' · ' + q.work : ''}`,
+    thumb: q.dash || q.door, icon: 'i-doc', text: [q.name, q.phone, carOf(q), q.service, q.work, q.estimate?.job, STATUS[q.status]],
+    go: () => { showTab('cotizaciones'); openQuoteDetail(q.id); } }));
+  return rows;
+}
+let searchRows = [];
+function runSearch() {
+  const raw = $('#search').value, terms = norm(raw).split(/\s+/).filter(Boolean);
+  const on = terms.length > 0;
+  document.body.classList.toggle('searching', on);
+  $('#searchResults').hidden = !on;
+  $('#searchClear').hidden = !raw; $('#searchKbd').hidden = !!raw;
+  if (!on) return;
+  searchRows = searchIndex().filter(r => { const h = norm(r.text.filter(Boolean).join(' ')); return terms.every(w => h.includes(w)); });
+  const groups = [...new Set(searchRows.map(r => r.group))];
+  $('#searchResults').innerHTML = groups.length ? groups.map(g => `
+    <div class="sr-group"><h3>${g}</h3><div class="sr-list">${searchRows.map((r, k) => r.group !== g ? '' : `
+      <button type="button" class="sr-row" data-r="${k}">
+        <span class="sr-thumb">${r.thumb ? `<img src="${esc(r.thumb)}" alt="" loading="lazy">` : icon(r.icon || 'i-folder')}</span>
+        <span class="sr-text"><strong>${highlight(r.title, terms)}</strong><span>${highlight(r.sub, terms)}</span></span>
+        ${icon('i-right')}
+      </button>`).join('')}</div></div>`).join('')
+    : `<div class="sr-empty"><strong>Sin resultados</strong>No encontramos nada para "${esc(raw.trim())}".</div>`;
+}
+function endSearch() {
+  $('#search').value = ''; runSearch(); $('#search').blur(); $('#searchCancel').hidden = true;
+}
+function flash(el) {
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+}
+$('#search').addEventListener('input', runSearch);
+$('#search').addEventListener('focus', () => $('#searchCancel').hidden = false);
+$('#search').addEventListener('keydown', e => {
+  if (e.key === 'Escape') endSearch();
+  if (e.key === 'Enter' && searchRows.length) $('#searchResults .sr-row').click();
+});
+$('#searchClear').addEventListener('click', () => { $('#search').value = ''; runSearch(); $('#search').focus(); });
+$('#searchCancel').addEventListener('click', endSearch);
+$('#searchResults').addEventListener('click', e => {
+  const r = e.target.closest('[data-r]'); if (!r) return;
+  const row = searchRows[+r.dataset.r];
+  endSearch(); row.go();
+});
+// "/" jumps to the search box from anywhere that isn't a text field
+addEventListener('keydown', e => {
+  if (e.key === '/' && !$('#app').hidden && !e.target.closest?.('input, textarea, select, [contenteditable]')) { e.preventDefault(); $('#search').focus(); }
+});
+
 // ---- services: cards in "Nuestros servicios" and their example photos ----
 const MAX_EXAMPLES = 60, MAX_SERVICES = 24;
 const pendingEx = {}; // uploads in progress per service, for the loading tiles
@@ -634,7 +814,18 @@ function slugify(t) {
 
 function renderServices() {
   const list = gallery.services;
-  $('#services').innerHTML = (list.length ? list.map((sv, i) => `
+  if (openF.servicios != null && !list[openF.servicios]) openF.servicios = null;
+  const open = openF.servicios;
+  $('#addService').hidden = open != null;
+  if (open == null) {
+    $('#services').innerHTML = list.length ? folderGrid(list.map((sv, i) => ({
+      name: sv.title.es || `Servicio ${i + 1} (sin título)`, cover: sv.cover && src(sv.cover),
+      photos: sv.examples.map(e => e.url), unit: 'ejemplo', pending: pendingEx[sv.id], missing: !sv.title.es.trim() || !sv.cover
+    }))) : '<div class="empty">No hay servicios. La sección "Nuestros servicios" se verá vacía en la página.</div>';
+    $('#addService').disabled = list.length >= MAX_SERVICES;
+    return;
+  }
+  $('#services').innerHTML = folderBar('Servicios', list[open].title.es || `Servicio ${open + 1}`) + [[list[open], open]].map(([sv, i]) => `
     <section class="service" data-s="${i}">
       <div class="client-head">
         <h2>Servicio ${i + 1}${sv.title.es ? ' · ' + esc(sv.title.es) : ''}</h2>
@@ -683,8 +874,7 @@ function renderServices() {
           <input class="file" type="file" accept="image/*" multiple data-vex>
         </label>
       </div>
-    </section>`).join('') : '<div class="empty">No hay servicios. La sección "Nuestros servicios" se verá vacía en la página.</div>');
-  $('#addService').disabled = list.length >= MAX_SERVICES;
+    </section>`).join('');
 }
 
 async function addExamples(sv, files) {
@@ -707,10 +897,8 @@ const svcAt = el => gallery.services[+el.closest('.service').dataset.s];
 
 $('#addService').addEventListener('click', () => {
   gallery.services.push({ id: '', cover: '', pos: '', alt: '', title: { es: '', en: '' }, desc: { es: '', en: '' }, examples: [] });
-  render();
-  const last = document.querySelector('.service:last-of-type');
-  last.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  last.querySelector('[data-vf="title.es"]').focus({ preventScroll: true });
+  openFolder('servicios', gallery.services.length - 1);
+  $('#services [data-vf="title.es"]').focus({ preventScroll: true });
 });
 $('#services').addEventListener('change', async e => {
   const el = e.target;
@@ -730,7 +918,11 @@ $('#services').addEventListener('input', e => {
     const [k, lang] = el.dataset.vf.split('.');
     sv[k][lang] = el.value;
     el.closest('.service').classList.remove('missing');
-    if (el.dataset.vf === 'title.es') el.closest('.service').querySelector('h2').textContent = `Servicio ${gallery.services.indexOf(sv) + 1}${el.value.trim() ? ' · ' + el.value.trim() : ''}`;
+    if (el.dataset.vf === 'title.es') {
+      const n = gallery.services.indexOf(sv) + 1;
+      el.closest('.service').querySelector('h2').textContent = `Servicio ${n}${el.value.trim() ? ' · ' + el.value.trim() : ''}`;
+      $('#services .folder-path strong').textContent = el.value.trim() || `Servicio ${n}`;
+    }
   }
   updateSavebar();
 });
@@ -739,10 +931,10 @@ $('#services').addEventListener('click', e => {
   const list = gallery.services, i = +b.closest('.service').dataset.s, sv = list[i];
   if (b.dataset.vact === 'del') {
     if (!confirm(`¿Eliminar el servicio "${sv.title.es || i + 1}"${sv.examples.length ? ` y sus ${sv.examples.length} ejemplos` : ''}?`)) return;
-    list.splice(i, 1);
+    list.splice(i, 1); openF.servicios = null;
   }
-  if (b.dataset.vact === 'up' && i > 0) [list[i - 1], list[i]] = [list[i], list[i - 1]];
-  if (b.dataset.vact === 'down' && i < list.length - 1) [list[i + 1], list[i]] = [list[i], list[i + 1]];
+  if (b.dataset.vact === 'up' && i > 0) { [list[i - 1], list[i]] = [list[i], list[i - 1]]; openF.servicios = i - 1; }
+  if (b.dataset.vact === 'down' && i < list.length - 1) { [list[i + 1], list[i]] = [list[i], list[i + 1]]; openF.servicios = i + 1; }
   const ex = sv.examples, j = +b.dataset.j;
   if (b.dataset.sact === 'del') { if (!confirm('¿Eliminar este ejemplo?')) return; ex.splice(j, 1); }
   if (b.dataset.sact === 'left' && j > 0) [ex[j - 1], ex[j]] = [ex[j], ex[j - 1]];
@@ -776,7 +968,14 @@ function firstIncomplete() {
 function render() {
   renderClients();
   renderServices();
-  $('#jobs').innerHTML = gallery.items.map((it, i) => `
+  const ti = openF.taller != null && gallery.items[openF.taller] ? openF.taller : (openF.taller = null);
+  if (ti == null) {
+    $('#jobs').innerHTML = folderGrid(gallery.items.map((it, i) => ({
+      name: it.title || `Trabajo ${i + 1}`, cover: src(it.cover), photos: it.photos, unit: 'foto', pending: it._pending
+    })));
+    return updateSavebar();
+  }
+  $('#jobs').innerHTML = folderBar('Hecho en nuestro taller', gallery.items[ti].title || `Trabajo ${ti + 1}`) + gallery.items.map((it, i) => i !== ti ? '' : `
     <section class="job" data-i="${i}">
       <div class="job-cover-col">
         <div class="job-cover"><img src="${esc(src(it.cover))}" alt=""><span class="num">Trabajo ${i + 1}</span></div>
@@ -857,6 +1056,7 @@ $('#jobs').addEventListener('change', e => {
 $('#jobs').addEventListener('input', e => {
   if (e.target.dataset.act !== 'title') return;
   gallery.items[+e.target.closest('.job').dataset.i].title = e.target.value;
+  $('#jobs .folder-path strong').textContent = e.target.value.trim() || `Trabajo ${openF.taller + 1}`;
   updateSavebar();
 });
 $('#jobs').addEventListener('click', e => {
@@ -885,6 +1085,7 @@ $('#save').addEventListener('click', async () => {
   const badSvc = firstIncompleteService();
   if (badSvc !== -1) {
     showTab('servicios');
+    openF.servicios = badSvc; render();
     const card = document.querySelector(`.service[data-s="${badSvc}"]`);
     card.classList.add('missing');
     card.scrollIntoView({ behavior: 'smooth', block: 'center' });
