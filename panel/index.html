@@ -856,6 +856,10 @@ function renderServices() {
       </div>
       <div class="photos-head"><strong>Ejemplos (${sv.examples.length})</strong><span class="hint">Se ven al tocar el servicio en la página</span></div>
       <div class="examples">
+        <label class="drop" tabindex="0">
+          <span>${icon('i-plus')}Agregar ejemplos</span>
+          <input class="file" type="file" accept="image/*" multiple data-vex>
+        </label>
         ${sv.examples.map((e, j) => `
           <div class="ex">
             <div class="ph">
@@ -869,10 +873,6 @@ function renderServices() {
             <input class="input cap" data-j="${j}" maxlength="100" placeholder="Descripción (opcional)" value="${esc(e.caption || '')}">
           </div>`).join('')}
         ${'<div class="ex"><div class="ph loading"></div></div>'.repeat(pendingEx[sv.id] || 0)}
-        <label class="drop" tabindex="0">
-          <span>${icon('i-plus')}Agregar ejemplos</span>
-          <input class="file" type="file" accept="image/*" multiple data-vex>
-        </label>
       </div>
     </section>`).join('');
 }
